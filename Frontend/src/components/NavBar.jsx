@@ -1,16 +1,19 @@
 import { useState } from "react";
+import LoginButton from "./LoginButton";
+import RegisterButton from "./RegisterButton";
+import { Link, NavLink } from "react-router-dom";
 
-const App = () => {
+const NavBar = () => {
   const [isHamClicked, setIsHamClicked] = useState(false);
   return (
     <>
       <nav className="max-w-full p-5 font-bold border-b border-slate-200 flex justify-between items-center ">
-        <a href="/">
+        <Link to="/">
           {" "}
           <h1 className="text-2xl font-mono ">
             Career<span className="text-blue-600">Forge</span>
           </h1>
-        </a>
+        </Link>
         {/* Mobile hamburger */}
         <div
           className="w-6 h-5 flex flex-col gap-1 hamburger cursor-pointer lg:hidden"
@@ -29,31 +32,27 @@ const App = () => {
             X
           </div>
           <ul className="font-bold text-xl mt-10 ml-2 flex flex-col gap-3">
-            <a href="/">
+            <Link to="/">
               <li>Home</li>
-            </a>
-            <a href="/about">
+            </Link>
+            <Link to="/about">
               <li>About Us</li>
-            </a>
-            <a href="/contact">
+            </Link>
+            <Link to="/contact">
               <li>Contact Us</li>
-            </a>
-            <a href="/jobs">
+            </Link>
+            <Link to="/jobs">
               <li>Browse Jobs</li>
-            </a>
+            </Link>
             <li>
-              <a href="/login">
-                <button className="px-3 py-3 bg-blue-600 text-white font-bold rounded-sm">
-                  Login
-                </button>
-              </a>
+              <Link to="/login">
+                <LoginButton />
+              </Link>
             </li>
             <li>
-              <a href="/register">
-                <button className=" cursor-pointer p-2 outline-2 outline-slate-300  font-bold rounded-sm">
-                  Register
-                </button>
-              </a>
+              <Link to="/register">
+                <RegisterButton />
+              </Link>
             </li>
           </ul>
         </div>
@@ -63,26 +62,26 @@ const App = () => {
         <div className="hidden lg:block">
           <ul className="flex items-center gap-5">
             <li>
-              <a href="/jobs">Browse Jobs</a>
+              <NavLink
+                className={({ isActive }) =>
+                  isActive &&
+                  "text-blue-600 underline decoration-2 underline-offset-2 "
+                }
+                to="/jobs"
+              >
+                Browse Jobs
+              </NavLink>
             </li>
 
             <li>
-              <a href="/login">
-                <button
-                  className="cursor-pointer p-2 w-22 bg-blue-600 text-white font-bold rounded-sm transition-all duration-300 hover:bg-blue-700 hover:scale-105 hover:shadow-lg"
-                >
-                  Login
-                </button>
-              </a>
+              <Link to="/login">
+                <LoginButton />
+              </Link>
             </li>
             <li>
-              <a href="/register">
-                <button
-                  className=" cursor-pointer p-2 outline-2 outline-slate-300 transition-all duration-300 hover:scale-105 hover:shadow-lg font-bold rounded-sm hover:bg-blue-600 hover:text-white hover:outline-0"
-                >
-                  Register
-                </button>
-              </a>
+              <Link to="/register">
+                <RegisterButton />
+              </Link>
             </li>
           </ul>
         </div>
@@ -91,4 +90,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default NavBar;
