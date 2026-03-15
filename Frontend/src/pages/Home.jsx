@@ -40,7 +40,7 @@ const Home = () => {
           {" "}
           Everything You Need
         </h1>
-        <div className="flex flex-col lg:flex-row gap-5 items-center lg:justify-around p-2 lg:p-5 ">
+        <div className="flex flex-col md:flex-row gap-5 items-center md:justify-around p-2 md:p-5 ">
           <Card
             icon={<HiMagnifyingGlass size="29px" color="#2463EB" />}
             title="Smart Job Search"
