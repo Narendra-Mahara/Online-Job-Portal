@@ -36,9 +36,9 @@ const Home = () => {
         </div>
       </div>
       <div className="p-2 bg-gray-100">
-        <h1 className="text-2xl text-center font-bold">
+        <h1 className="text-3xl text-center font-bold mb-5">
           {" "}
-          Everythinig You Need
+          Everything You Need
         </h1>
         <div className="flex flex-col lg:flex-row gap-5 items-center lg:justify-around p-2 lg:p-5 ">
           <Card
