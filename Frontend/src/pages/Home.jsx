@@ -1,5 +1,9 @@
-import React from "react";
+import { HiMagnifyingGlass } from "react-icons/hi2";
+import { IoDocumentTextOutline } from "react-icons/io5";
+import { BiGroup } from "react-icons/bi";
 import { Link } from "react-router-dom";
+import Card from "../components/Card";
+
 const Home = () => {
   return (
     <>
@@ -17,18 +21,41 @@ const Home = () => {
           <div className="mt-8 flex justify-center gap-4 flex-wrap">
             <Link to="/jobs">
               {" "}
-              <button className="bg-blue-600 text-white px-6 py-3 rounded-lg transition-all duration-300 hover:bg-blue-700 hover:scale-105 hover:shadow-lg cursor-pointer">
+              <button className="bg-blue-600 text-white px-6 py-3 rounded-sm transition-all duration-300 hover:bg-blue-700 hover:scale-105 hover:shadow-lg cursor-pointer">
                 Browse Jobs
               </button>
             </Link>
 
             <Link to="/register">
               {" "}
-              <button className="border border-gray-300 px-6 py-3 rounded-lg  transition-all duration-300  hover:scale-105 hover:shadow-lg  cursor-pointer">
+              <button className="border border-gray-300 px-6 py-3 rounded-sm  transition-all duration-300  hover:scale-105 hover:shadow-lg  cursor-pointer">
                 Get Started
               </button>
             </Link>
           </div>
+        </div>
+      </div>
+      <div className="p-2 bg-gray-100">
+        <h1 className="text-3xl text-center font-bold mb-5">
+          {" "}
+          Everything You Need
+        </h1>
+        <div className="flex flex-col lg:flex-row gap-5 items-center lg:justify-around p-2 lg:p-5 ">
+          <Card
+            icon={<HiMagnifyingGlass size="29px" color="#2463EB" />}
+            title="Smart Job Search"
+            desc="Find the job that suits you best based on location, salary, job type, and experience level."
+          />
+          <Card
+            icon={<IoDocumentTextOutline size="29px" color="#2463EB" />}
+            title="Resume Builder"
+            desc="Build a professional resume with our integrated builder and download as PDF."
+          />
+          <Card
+            icon={<BiGroup size="29px" color="#2463EB" />}
+            title="For Employers Too"
+            desc="Post jobs, review applicants, and manage your hiring pipeline effortlessly."
+          />
         </div>
       </div>
     </>
