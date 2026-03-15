@@ -16,7 +16,7 @@ const NavBar = () => {
         </Link>
         {/* Mobile hamburger */}
         <div
-          className="w-6 h-5 flex flex-col gap-1 hamburger cursor-pointer lg:hidden"
+          className="w-6 h-5 flex flex-col gap-1 hamburger cursor-pointer md:hidden"
           onClick={() => setIsHamClicked(!isHamClicked)}
         >
           <div className="bg-black w-6 h-1"></div>
@@ -24,7 +24,7 @@ const NavBar = () => {
           <div className="bg-black w-4 h-1"></div>
         </div>
         <div
-          className={`bg-slate-900 text-white lg:hidden flex flex-row-reverse justify-between fixed top-0 right-0 p-5 h-screen w-64 transform transition-transform duration-300 ease-in-out ${
+          className={`bg-slate-900 text-white md:hidden flex flex-row-reverse justify-between fixed top-0 right-0 p-5 h-screen w-64 transform transition-transform duration-300 ease-in-out ${
             isHamClicked ? "translate-x-0" : "translate-x-full"
           }`}
         >
@@ -59,7 +59,7 @@ const NavBar = () => {
 
         {/* For Larger Screen */}
 
-        <div className="hidden lg:block">
+        <div className="hidden md:block">
           <ul className="flex items-center gap-5">
             <li>
               <NavLink
