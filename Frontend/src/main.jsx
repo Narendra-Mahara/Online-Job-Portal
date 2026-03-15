@@ -14,6 +14,7 @@ import Contact from "./pages/Contact.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Jobs from "./pages/Jobs.jsx";
+import ResumeBuilder from "./pages/ResumeBuilder.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,6 +25,7 @@ const router = createBrowserRouter(
       <Route path="/jobs" element={<Jobs />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/about" element={<About />} />
+      <Route path="/resume-builder" element={<ResumeBuilder />} />
     </Route>,
   ),
 );
