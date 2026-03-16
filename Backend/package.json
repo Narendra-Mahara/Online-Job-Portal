@@ -4,5 +4,15 @@
   "type": "module",
   "main": "index.js",
   "author": "Narendra Singh Mahara",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon ./src/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
 }
