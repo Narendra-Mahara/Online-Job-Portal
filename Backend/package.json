@@ -1,0 +1,8 @@
+{
+  "name": "careerforge-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "author": "Narendra Singh Mahara",
+  "license": "MIT"
+}
