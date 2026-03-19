@@ -29,7 +29,6 @@ const userSchema = new Schema(
     },
     phone: {
       type: String,
-      required: true,
       trim: true,
     },
     profileImage: {
@@ -47,11 +46,10 @@ const userSchema = new Schema(
 
 //Hash the password
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) return;
 
   this.password = await bcrypt.hash(this.password, 10);
-  next();
-});
+}); // we shouldn't use next() if we use async
 
 //Check the password
 userSchema.methods.isPasswordCorrect = async function (password) {
