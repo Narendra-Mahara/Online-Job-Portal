@@ -15,4 +15,7 @@ app.use(express.urlencoded()); // Parse URL-encoded bodies (as sent by HTML form
 app.use(express.static("public")); // Serve static files from the "public" directory
 app.use(cookieParser()); // Parse cookies
 
+import userRouter from "./routes/user.routes.js";
+app.use("/api/v1/users", userRouter);
+
 export default app;
