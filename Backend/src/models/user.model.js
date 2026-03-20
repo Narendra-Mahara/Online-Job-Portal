@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const userSchema = new Schema(
   {
@@ -29,7 +30,6 @@ const userSchema = new Schema(
     },
     phone: {
       type: String,
-      required: true,
       trim: true,
     },
     profileImage: {
@@ -41,21 +41,49 @@ const userSchema = new Schema(
       type: String,
       maxLength: 250,
     },
+    refreshToken: {
+      type: String,
+    },
   },
   { timestamps: true },
 );
 
 //Hash the password
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) return;
 
   this.password = await bcrypt.hash(this.password, 10);
-  next();
-});
+}); // we shouldn't use next() if we use async
 
 //Check the password
 userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
+};
+
+//Generate AccessToken
+userSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    },
+  );
+};
+
+//Generate RefreshToken
+userSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+    },
+  );
 };
 
 export const User = model("User", userSchema);
