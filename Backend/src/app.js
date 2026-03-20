@@ -18,4 +18,8 @@ app.use(cookieParser()); // Parse cookies
 import userRouter from "./routes/user.routes.js";
 app.use("/api/v1/users", userRouter);
 
+//Job Routes
+import jobRouter from "./routes/job.routes.js";
+app.use("/api/v1/jobs", jobRouter);
+
 export default app;
