@@ -21,3 +21,11 @@ export const jwtVerify = async (req, res, next) => {
     throw new ApiError(401, error || "Invalid access token");
   }
 };
+
+export const isEmployer = (req, res, next) => {
+  if (req.user && req.user.role === "employer") {
+    next();
+  } else {
+    next(new ApiError(403, "Access denied. Only employers can post jobs."));
+  }
+};
