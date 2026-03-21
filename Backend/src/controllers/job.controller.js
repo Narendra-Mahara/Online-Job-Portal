@@ -16,7 +16,7 @@ const createJob = async (req, res) => {
     if (
       !title?.trim() ||
       !description?.trim() ||
-      !Array.isArray(requirements)  ||
+      !Array.isArray(requirements) ||
       !jobType ||
       !company?.trim() ||
       !location?.trim() ||
@@ -50,4 +50,28 @@ const createJob = async (req, res) => {
   }
 };
 
-export { createJob };
+const getAllJobs = async (req, res) => {
+  try {
+    // Only fetch jobs where the status is "active"
+    // .sort({ createdAt: -1 }) puts the newest jobs first
+    const jobs = await Job.find({ status: "active" }).sort({ createdAt: -1 });
+
+    if (jobs.length === 0) {
+      return res
+        .status(200)
+        .json(new ApiResponse(200, [], "No active jobs found"));
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, jobs, "Successfully fetched jobs"));
+  } catch (error) {
+    console.error("Get All Jobs Error:", error);
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(500, null, error.message || "Internal Server Error"),
+      );
+  }
+};
+export { createJob, getAllJobs };
