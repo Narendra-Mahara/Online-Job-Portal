@@ -98,5 +98,25 @@ const getJobById = async (req, res) => {
   }
 };
 
+const getEmployerJob = async (req, res) => {
+  try {
+    const id = req.user._id;
 
-export { createJob, getAllJobs, getJobById };
+    const jobs = await Job.find({ employer: id });
+
+    if (jobs.length === 0) {
+      return res
+        .status(200)
+        .json(new ApiResponse(200, [], "No jobs found"));
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, jobs, "Successfully fetched jobs"));
+  } catch (error) {
+    console.error("Get Employer Jobs Error:", error);
+    return res.status(500).json(new ApiResponse(500, null, "Server Error"));
+  }
+};
+
+export { createJob, getAllJobs, getJobById, getEmployerJob };
