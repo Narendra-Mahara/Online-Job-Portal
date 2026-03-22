@@ -74,4 +74,29 @@ const getAllJobs = async (req, res) => {
       );
   }
 };
-export { createJob, getAllJobs };
+
+const getJobById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const job = await Job.findById(id);
+
+    if (!job) {
+      throw new ApiError(404, "Job not found");
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, job, "Job fetched successfully"));
+  } catch (error) {
+    console.error("Get Job by ID Error:", error);
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(500, null, error.message || "Internal Server Error"),
+      );
+  }
+};
+
+
+export { createJob, getAllJobs, getJobById };
