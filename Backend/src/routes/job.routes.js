@@ -6,5 +6,6 @@ const router = Router();
 
 router.route("/create").post(jwtVerify, isEmployer, createJob);
 router.route("/").get(getAllJobs);
+router.route("/:id").get(getJobById);
 
 export default router;
