@@ -1,4 +1,3 @@
-import { response } from "express";
 import { Job } from "../models/job.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
