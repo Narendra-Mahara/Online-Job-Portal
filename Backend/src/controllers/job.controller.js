@@ -1,3 +1,4 @@
+import { response } from "express";
 import { Job } from "../models/job.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -105,9 +106,7 @@ const getEmployerJob = async (req, res) => {
     const jobs = await Job.find({ employer: id });
 
     if (jobs.length === 0) {
-      return res
-        .status(200)
-        .json(new ApiResponse(200, [], "No jobs found"));
+      return res.status(200).json(new ApiResponse(200, [], "No jobs found"));
     }
 
     return res
@@ -119,4 +118,29 @@ const getEmployerJob = async (req, res) => {
   }
 };
 
-export { createJob, getAllJobs, getJobById, getEmployerJob };
+const updateJobStatus = async (req, res) => {
+  const job = await Job.findById(req.params.id);
+  if (!job) {
+    throw new ApiError(400, "Invalid job id");
+  }
+
+  if (job.employer.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Unauthorized access");
+  }
+  let result = await Job.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        status: "closed",
+      },
+    },
+    {
+      new: true,
+    },
+  );
+  res
+    .status(200)
+    .json(new ApiResponse(200, result, "Status updated successfully"));
+};
+
+export { createJob, getAllJobs, getJobById, getEmployerJob, updateJobStatus };
