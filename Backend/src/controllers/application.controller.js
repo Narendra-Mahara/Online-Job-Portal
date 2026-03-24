@@ -72,4 +72,33 @@ const applyForJob = async (req, res) => {
   }
 };
 
-export { applyForJob };
+const getMyApplications = async (req, res) => {
+  try {
+    const applications = await Application.find({
+      applicant: req.user._id,
+    })
+      .populate({
+        path: "job",
+        select: "title company location jobType",
+      })
+      .sort({ createdAt: -1 });
+
+    if (applications.length === 0) {
+      return res
+        .status(200)
+        .json(new ApiResponse(200, [], "No applications found"));
+    }
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, applications, "Successfully fetched applications"),
+      );
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, [], "Error while fetching the applications"));
+  }
+};
+
+
+export { applyForJob, getMyApplications };
