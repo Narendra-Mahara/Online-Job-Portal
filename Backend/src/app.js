@@ -25,4 +25,9 @@ app.use("/api/v1/jobs", jobRouter);
 //Resume Routes
 import resumeRouter from "./routes/resume.routes.js";
 app.use("/api/v1/resume", resumeRouter);
+
+//Application Routes
+import applicationRouter from "./routes/application.routes.js";
+app.use("/api/v1/application", applicationRouter);
+
 export default app;
