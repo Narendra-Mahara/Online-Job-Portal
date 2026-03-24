@@ -22,4 +22,7 @@ app.use("/api/v1/users", userRouter);
 import jobRouter from "./routes/job.routes.js";
 app.use("/api/v1/jobs", jobRouter);
 
+//Resume Routes
+import resumeRouter from "./routes/resume.routes.js";
+app.use("/api/v1/resume", resumeRouter);
 export default app;
