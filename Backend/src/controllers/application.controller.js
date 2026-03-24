@@ -100,5 +100,45 @@ const getMyApplications = async (req, res) => {
   }
 };
 
+const getApplicationsByJob = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
 
-export { applyForJob, getMyApplications };
+    if (!job) {
+      return res.status(404).json(new ApiResponse(404, null, "Job not found"));
+    }
+
+    if (job.employer.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json(
+          new ApiResponse(
+            403,
+            null,
+            "Unauthorized: You do not have permission to view these applications.",
+          ),
+        );
+    }
+
+    const applications = await Application.find({
+      job: req.params.id,
+    })
+      .populate("resume")
+      .sort({ createdAt: -1 });
+    if (applications.length === 0) {
+      return res
+        .status(200)
+        .json(new ApiResponse(200, [], "No applications found"));
+    }
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, applications, "Successfully fetched applications"),
+      );
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, [], "Error while fetching the applications"));
+  }
+};
+export { applyForJob, getMyApplications, getApplicationsByJob };
