@@ -4,6 +4,7 @@ import {
   registerUser,
   logoutUser,
   updateProfile,
+  deleteUser,
 } from "../controllers/user.controller.js";
 import { jwtVerify } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
@@ -16,4 +17,5 @@ router.route("/logout").post(jwtVerify, logoutUser);
 router
   .route("/update-profile")
   .post(jwtVerify, upload.single("profileImage"), updateProfile);
+router.route("/delete").delete(jwtVerify, deleteUser);
 export default router;
