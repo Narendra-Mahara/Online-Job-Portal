@@ -2,6 +2,7 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import validator from "validator";
 import { User } from "../models/user.model.js";
+import uploadOnCloudinary from "../utils/cloudinary.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -130,4 +131,71 @@ const logoutUser = async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out successfully"));
 };
 
-export { registerUser, loginUser, logoutUser };
+const updateProfile = async (req, res) => {
+  try {
+    const { name, email, address, phone, bio } = req.body;
+
+    const updateData = {};
+
+    if (name) updateData.name = name.trim();
+
+    if (email) {
+      if (!validator.isEmail(email)) {
+        throw new ApiError(400, "Invalid email format");
+      }
+
+      const existingUser = await User.findOne({
+        email: email.toLowerCase().trim(),
+        _id: { $ne: req.user._id },
+      });
+
+      if (existingUser) {
+        throw new ApiError(400, "Email already in use");
+      }
+
+      updateData.email = email.toLowerCase().trim();
+    }
+
+    if (address) updateData.address = address.trim();
+    if (phone) updateData.phone = phone.trim();
+    if (bio) updateData.bio = bio.trim();
+
+    if (req.file?.path) {
+      const cloudinaryUrl = await uploadOnCloudinary(req.file.path);
+
+      if (!cloudinaryUrl) {
+        throw new ApiError(500, "Error uploading profile image");
+      }
+
+      updateData.profileImage = cloudinaryUrl;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      throw new ApiError(400, "No data provided to update");
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: updateData },
+      { new: true, runValidators: true },
+    ).select("-password");
+
+    if (!updatedUser) {
+      throw new ApiError(404, "User not found");
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, updatedUser, "Profile updated successfully"));
+  } catch (error) {
+    console.error("Update Profile Error:", error);
+
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(500, null, error.message || "Internal Server Error"),
+      );
+  }
+};
+
+export { registerUser, loginUser, logoutUser, updateProfile };
