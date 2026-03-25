@@ -3,6 +3,9 @@ import ApiResponse from "../utils/ApiResponse.js";
 import validator from "validator";
 import { User } from "../models/user.model.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
+import { Resume } from "../models/resume.model.js";
+import { Application } from "../models/application.model.js";
+import { Job } from "../models/job.model.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -198,4 +201,48 @@ const updateProfile = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser, updateProfile };
+const deleteUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    if (req.user.role === "jobseeker") {
+      await Resume.deleteMany({ user: userId });
+      await Application.deleteMany({ applicant: userId });
+    }
+
+    if (req.user.role === "employer") {
+      const employerJobs = await Job.find({ employer: userId });
+      const jobIds = employerJobs.map((job) => job._id);
+      if (jobIds.length > 0) {
+        await Application.deleteMany({ job: { $in: jobIds } });
+      }
+
+      await Job.deleteMany({ employer: userId });
+    }
+
+    await User.findByIdAndDelete(userId);
+
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    };
+
+    return res
+      .status(200)
+      .clearCookie("accessToken", options)
+      .clearCookie("refreshToken", options)
+      .json(
+        new ApiResponse(
+          200,
+          {},
+          "User and all associated data deleted successfully",
+        ),
+      );
+  } catch (error) {
+    console.error("Delete User Error:", error);
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Error while deleting user account"));
+  }
+};
+export { registerUser, loginUser, logoutUser, updateProfile, deleteUser };
