@@ -141,4 +141,74 @@ const getApplicationsByJob = async (req, res) => {
       .json(new ApiResponse(500, [], "Error while fetching the applications"));
   }
 };
-export { applyForJob, getMyApplications, getApplicationsByJob };
+
+const updateApplicationStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    if (!status?.trim()) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Status is required"));
+    }
+
+    const allowedStatuses = ["pending", "shortlisted", "rejected"];
+
+    if (!allowedStatuses.includes(status.toLowerCase())) {
+      return res
+        .status(400)
+        .json(
+          new ApiResponse(
+            400,
+            null,
+            `Invalid status. Allowed values are: ${allowedStatuses.join(", ")}`,
+          ),
+        );
+    }
+    const application = await Application.findById(req.params.id).populate(
+      "job",
+    );
+
+    if (!application) {
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "Application not found"));
+    }
+
+    if (application.job.employer.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json(
+          new ApiResponse(
+            403,
+            null,
+            "Unauthorized: You cannot update this application",
+          ),
+        );
+    }
+    application.status = status.toLowerCase(); // keep it lowercase for database consistency
+    await application.save();
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          application,
+          "Application status updated successfully",
+        ),
+      );
+  } catch (error) {
+    console.error("Update Application Status Error:", error);
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(500, null, error.message || "Internal Server Error"),
+      );
+  }
+};
+export {
+  applyForJob,
+  getMyApplications,
+  getApplicationsByJob,
+  updateApplicationStatus,
+};
