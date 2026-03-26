@@ -50,4 +50,32 @@ const createResume = async (req, res) => {
   }
 };
 
-export { createResume };
+const deleteResume = async (req, res) => {
+  try {
+    const { resumeId } = req.params;
+
+    if (!resumeId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Resume ID is needed"));
+    }
+
+    const deletedResume = await Resume.findOneAndDelete({
+      _id: resumeId,
+      user: req.user._id,
+    });
+    if (!deletedResume) {
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "Resume not found"));
+    }
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "Successfully deleted resume"));
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Error while deleting resume", error));
+  }
+};
+export { createResume, deleteResume };
