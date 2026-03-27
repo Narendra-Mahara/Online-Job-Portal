@@ -66,6 +66,33 @@ const getResume = async (req, res) => {
   }
 };
 
+const getResumeById = async (req, res) => {
+  try {
+    const resumeId = req.params.id;
+    if (!resumeId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Resume id is required"));
+    }
+
+    const resume = await Resume.findOne({ _id: resumeId, user: req.user._id });
+
+    if (!resume) {
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "Resume not found or unauthorized"));
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, resume, "Successfully fetched resume"));
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal server error"));
+  }
+};
+
 const deleteResume = async (req, res) => {
   try {
     const { resumeId } = req.params;
@@ -94,4 +121,4 @@ const deleteResume = async (req, res) => {
       .json(new ApiResponse(500, null, "Error while deleting resume", error));
   }
 };
-export { createResume, deleteResume, getResume };
+export { createResume, deleteResume, getResume, getResumeById };
