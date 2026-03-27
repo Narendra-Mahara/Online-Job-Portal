@@ -50,4 +50,75 @@ const createResume = async (req, res) => {
   }
 };
 
-export { createResume };
+const getResume = async (req, res) => {
+  try {
+    const resumes = await Resume.find({ user: req.user._id });
+    if (resumes.length === 0) {
+      return res.status(200).json(new ApiResponse(200, [], "No resume found"));
+    }
+    return res
+      .status(200)
+      .json(new ApiResponse(200, resumes, "Successfully fetched resume"));
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, [], "Internal server error"));
+  }
+};
+
+const getResumeById = async (req, res) => {
+  try {
+    const resumeId = req.params.id;
+    if (!resumeId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Resume id is required"));
+    }
+
+    const resume = await Resume.findOne({ _id: resumeId, user: req.user._id });
+
+    if (!resume) {
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "Resume not found or unauthorized"));
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, resume, "Successfully fetched resume"));
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal server error"));
+  }
+};
+
+const deleteResume = async (req, res) => {
+  try {
+    const { resumeId } = req.params;
+
+    if (!resumeId) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Resume ID is needed"));
+    }
+
+    const deletedResume = await Resume.findOneAndDelete({
+      _id: resumeId,
+      user: req.user._id,
+    });
+    if (!deletedResume) {
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "Resume not found"));
+    }
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "Successfully deleted resume"));
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Error while deleting resume", error));
+  }
+};
+export { createResume, deleteResume, getResume, getResumeById };

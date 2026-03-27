@@ -1,7 +1,16 @@
 import { Router } from "express";
 import { isJobseeker, jwtVerify } from "../middleware/auth.middleware.js";
-import { createResume } from "../controllers/resume.controller.js";
+import {
+  createResume,
+  deleteResume,
+  getResume,
+  getResumeById,
+} from "../controllers/resume.controller.js";
+
 const router = Router();
 
 router.route("/create").post(jwtVerify, isJobseeker, createResume);
+router.route("/delete/:resumeId").delete(jwtVerify, isJobseeker, deleteResume);
+router.route("/get-resume").get(jwtVerify, isJobseeker, getResume);
+router.route("/:id").get(jwtVerify, isJobseeker, getResumeById);
 export default router;
