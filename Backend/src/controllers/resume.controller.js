@@ -50,6 +50,22 @@ const createResume = async (req, res) => {
   }
 };
 
+const getResume = async (req, res) => {
+  try {
+    const resumes = await Resume.find({ user: req.user._id });
+    if (resumes.length === 0) {
+      return res.status(200).json(new ApiResponse(200, [], "No resume found"));
+    }
+    return res
+      .status(200)
+      .json(new ApiResponse(200, resumes, "Successfully fetched resume"));
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, [], "Internal server error"));
+  }
+};
+
 const deleteResume = async (req, res) => {
   try {
     const { resumeId } = req.params;
@@ -78,4 +94,4 @@ const deleteResume = async (req, res) => {
       .json(new ApiResponse(500, null, "Error while deleting resume", error));
   }
 };
-export { createResume, deleteResume };
+export { createResume, deleteResume, getResume };
