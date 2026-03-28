@@ -118,28 +118,35 @@ const getEmployerJob = async (req, res) => {
 };
 
 const updateJobStatus = async (req, res) => {
-  const job = await Job.findById(req.params.id);
-  if (!job) {
-    throw new ApiError(400, "Invalid job id");
-  }
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) {
+      throw new ApiError(400, "Invalid job id");
+    }
 
-  if (job.employer.toString() !== req.user._id.toString()) {
-    throw new ApiError(403, "Unauthorized access");
-  }
-  let result = await Job.findByIdAndUpdate(
-    req.params.id,
-    {
-      $set: {
-        status: "closed",
+    if (job.employer.toString() !== req.user._id.toString()) {
+      throw new ApiError(403, "Unauthorized access");
+    }
+    let result = await Job.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          status: "closed",
+        },
       },
-    },
-    {
-      new: true,
-    },
-  );
-  res
-    .status(200)
-    .json(new ApiResponse(200, result, "Status updated successfully"));
+      {
+        new: true,
+      },
+    );
+    res
+      .status(200)
+      .json(new ApiResponse(200, result, "Status updated successfully"));
+  } catch (error) {
+    console.error("Update Job Status Error:", error);
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
+  }
 };
 
 export { createJob, getAllJobs, getJobById, getEmployerJob, updateJobStatus };

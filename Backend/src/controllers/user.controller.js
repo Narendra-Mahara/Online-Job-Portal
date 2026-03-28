@@ -24,114 +24,144 @@ const generateAccessAndRefreshToken = async (userId) => {
 };
 
 const registerUser = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  try {
+    const { name, email, password, role } = req.body;
 
-  if (!name?.trim() || !email?.trim() || !password?.trim() || !role?.trim()) {
-    throw new ApiError(400, "All the fields are required");
+    if (!name?.trim() || !email?.trim() || !password?.trim() || !role?.trim()) {
+      throw new ApiError(400, "All the fields are required");
+    }
+
+    //check if email is valid
+    if (!validator.isEmail(email))
+      throw new ApiError(400, "Invalid email format");
+
+    //Check if user already exists
+    const existedUser = await User.findOne({
+      email: email.toLowerCase().trim(),
+    });
+
+    if (existedUser)
+      throw new ApiError(400, "User with this email already exists");
+    //Register user
+    const user = await User.create({
+      name,
+      email: email.toLowerCase().trim(),
+      password,
+      role,
+    });
+
+    // Fetch the created user without the password field to send back
+    const createdUser = await User.findById(user._id).select("-password");
+    if (!createdUser) {
+      throw new ApiError(
+        500,
+        "Something went wrong while registering the user",
+      );
+    }
+
+    // SEND THE RESPONSE
+    return res
+      .status(201)
+      .json(new ApiResponse(201, createdUser, "User registered successfully"));
+  } catch (error) {
+    console.error("Register User Error:", error);
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(500, null, error.message || "Internal Server Error"),
+      );
   }
-
-  //check if email is valid
-  if (!validator.isEmail(email))
-    throw new ApiError(400, "Invalid email format");
-
-  //Check if user already exists
-  const existedUser = await User.findOne({
-    email: email.toLowerCase().trim(),
-  });
-
-  if (existedUser)
-    throw new ApiError(400, "User with this email already exists");
-  //Register user
-  const user = await User.create({
-    name,
-    email: email.toLowerCase().trim(),
-    password,
-    role,
-  });
-
-  // Fetch the created user without the password field to send back
-  const createdUser = await User.findById(user._id).select("-password");
-  if (!createdUser) {
-    throw new ApiError(500, "Something went wrong while registering the user");
-  }
-
-  // SEND THE RESPONSE
-  return res
-    .status(201)
-    .json(new ApiResponse(201, createdUser, "User registered successfully"));
 };
 
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email?.trim() || !password?.trim()) {
-    throw new ApiError(400, "All fields are required!");
-  }
-  const user = await User.findOne({
-    email: email.toLowerCase().trim(),
-  });
+  try {
+    const { email, password } = req.body;
+    if (!email?.trim() || !password?.trim()) {
+      throw new ApiError(400, "All fields are required!");
+    }
+    const user = await User.findOne({
+      email: email.toLowerCase().trim(),
+    });
 
-  if (!user) {
-    throw new ApiError(400, "User doesn't exists");
-  }
+    if (!user) {
+      throw new ApiError(400, "User doesn't exists");
+    }
 
-  const isPasswordValid = await user.isPasswordCorrect(password);
+    const isPasswordValid = await user.isPasswordCorrect(password);
 
-  if (!isPasswordValid) {
-    throw new ApiError(400, "Incorrect password");
-  }
+    if (!isPasswordValid) {
+      throw new ApiError(400, "Incorrect password");
+    }
 
-  //Generate jwt AccessToken and RefreshToken
-  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
-    user._id,
-  );
-
-  const loggedInUser = await User.findById(user._id).select(
-    "-password -refreshToken",
-  );
-
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
-
-  return res
-    .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
-    .json(
-      new ApiResponse(
-        200,
-        {
-          user: loggedInUser,
-          accessToken,
-          refreshToken,
-        },
-        "User logged in successfully",
-      ),
+    //Generate jwt AccessToken and RefreshToken
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+      user._id,
     );
+
+    const loggedInUser = await User.findById(user._id).select(
+      "-password -refreshToken",
+    );
+
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json(
+        new ApiResponse(
+          200,
+          {
+            user: loggedInUser,
+            accessToken,
+            refreshToken,
+          },
+          "User logged in successfully",
+        ),
+      );
+  } catch (error) {
+    console.error("Login User Error:", error);
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(500, null, error.message || "Internal Server Error"),
+      );
+  }
 };
 
 const logoutUser = async (req, res) => {
-  await User.findByIdAndUpdate(
-    req.user._id,
-    {
-      $set: {
-        refreshToken: undefined,
+  try {
+    await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $set: {
+          refreshToken: undefined,
+        },
       },
-    },
-    {
-      new: true,
-    },
-  );
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
-  return res
-    .status(200)
-    .clearCookie("accessToken", options)
-    .clearCookie("refreshToken", options)
-    .json(new ApiResponse(200, {}, "User logged out successfully"));
+      {
+        new: true,
+      },
+    );
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+    return res
+      .status(200)
+      .clearCookie("accessToken", options)
+      .clearCookie("refreshToken", options)
+      .json(new ApiResponse(200, {}, "User logged out successfully"));
+  } catch (error) {
+    console.error("Logout User Error:", error);
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(500, null, error.message || "Internal Server Error"),
+      );
+  }
 };
 
 const updateProfile = async (req, res) => {
