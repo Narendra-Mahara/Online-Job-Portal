@@ -24,7 +24,7 @@ const NavBar = () => {
           <div className="bg-black w-4 h-1"></div>
         </div>
         <div
-          className={`bg-slate-900 text-white md:hidden flex flex-row-reverse justify-between fixed top-0 right-0 p-5 h-screen w-64 transform transition-transform duration-300 ease-in-out ${
+          className={`bg-slate-900 z-50 text-white md:hidden flex flex-row-reverse justify-between fixed top-0 right-0 p-5 h-screen w-64 transform transition-transform duration-300 ease-in-out ${
             isHamClicked ? "translate-x-0" : "translate-x-full"
           }`}
         >
