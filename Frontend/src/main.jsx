@@ -15,6 +15,7 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Jobs from "./pages/Jobs.jsx";
 import ResumeBuilder from "./pages/ResumeBuilder.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,6 +27,7 @@ const router = createBrowserRouter(
       <Route path="/contact" element={<Contact />} />
       <Route path="/about" element={<About />} />
       <Route path="/resume-builder" element={<ResumeBuilder />} />
+      <Route path="/dashboard" element={<Dashboard />} />
     </Route>,
   ),
 );
