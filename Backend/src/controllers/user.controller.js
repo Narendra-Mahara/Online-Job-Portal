@@ -6,6 +6,7 @@ import uploadOnCloudinary from "../utils/cloudinary.js";
 import { Resume } from "../models/resume.model.js";
 import { Application } from "../models/application.model.js";
 import { Job } from "../models/job.model.js";
+import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -104,7 +105,8 @@ const loginUser = async (req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
     };
 
     return res
@@ -147,7 +149,8 @@ const logoutUser = async (req, res) => {
     );
     const options = {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
     };
     return res
       .status(200)
@@ -160,6 +163,59 @@ const logoutUser = async (req, res) => {
       .status(500)
       .json(
         new ApiResponse(500, null, error.message || "Internal Server Error"),
+      );
+  }
+};
+
+const refreshAccessToken = async (req, res) => {
+  try {
+    const incomingRefreshToken = req.cookies?.refreshToken;
+
+    if (!incomingRefreshToken) {
+      throw new ApiError(401, "Unauthorized request");
+    }
+
+    const decoded = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+    );
+
+    const user = await User.findById(decoded?._id);
+
+    if (!user || user.refreshToken !== incomingRefreshToken) {
+      throw new ApiError(401, "Invalid refresh token");
+    }
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+      user._id,
+    );
+
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    };
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json(
+        new ApiResponse(
+          200,
+          {
+            accessToken,
+            refreshToken,
+          },
+          "Access token refreshed successfully",
+        ),
+      );
+  } catch (error) {
+    console.error("Refresh Access Token Error:", error);
+    return res
+      .status(401)
+      .json(
+        new ApiResponse(401, null, error.message || "Invalid refresh token"),
       );
   }
 };
@@ -255,6 +311,8 @@ const deleteUser = async (req, res) => {
     const options = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      sameSite: "lax",
     };
 
     return res
@@ -275,4 +333,19 @@ const deleteUser = async (req, res) => {
       .json(new ApiResponse(500, null, "Error while deleting user account"));
   }
 };
-export { registerUser, loginUser, logoutUser, updateProfile, deleteUser };
+
+const getUser = async (req, res) => {
+  res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "User profile fetched successfully"));
+};
+
+export {
+  registerUser,
+  loginUser,
+  refreshAccessToken,
+  logoutUser,
+  updateProfile,
+  deleteUser,
+  getUser,
+};
