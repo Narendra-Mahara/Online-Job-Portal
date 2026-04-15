@@ -15,6 +15,11 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Jobs from "./pages/Jobs.jsx";
 import ResumeBuilder from "./pages/ResumeBuilder.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import JobseekerDashboard from "./pages/JobseekerDashboard.jsx";
+import EmployerDashboard from "./pages/EmployerDashboard.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,12 +31,31 @@ const router = createBrowserRouter(
       <Route path="/contact" element={<Contact />} />
       <Route path="/about" element={<About />} />
       <Route path="/resume-builder" element={<ResumeBuilder />} />
+
+      <Route
+        path="/jobseeker/dashboard"
+        element={
+          <ProtectedRoute allowedRole="jobseeker">
+            <JobseekerDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employer/dashboard"
+        element={
+          <ProtectedRoute allowedRole="employer">
+            <EmployerDashboard />
+          </ProtectedRoute>
+        }
+      />
     </Route>,
   ),
 );
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 );
