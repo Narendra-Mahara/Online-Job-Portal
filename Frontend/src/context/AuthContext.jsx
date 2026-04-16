@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
           `${import.meta.env.VITE_API_BASE_URL}/users/me`,
           { withCredentials: true },
         );
-        setUser(meResponse.data?.data.user || null);
+        setUser(meResponse.data?.data || null);
       } catch (error) {
         if (error.response?.status === 401) {
           try {
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
               { withCredentials: true },
             );
 
-            setUser(retryResponse.data?.data.user || null);
+            setUser(retryResponse.data?.data || null);
           } catch (refreshError) {
             setUser(null);
           }
