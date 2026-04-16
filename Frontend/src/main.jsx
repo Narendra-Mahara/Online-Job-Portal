@@ -20,6 +20,9 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import JobseekerDashboard from "./pages/JobseekerDashboard.jsx";
 import EmployerDashboard from "./pages/EmployerDashboard.jsx";
+import JobseekerLayout from "./components/JobseekerLayout.jsx";
+import Profile from "./pages/Profile.jsx";
+import EmployerLayout from "./components/EmployerLayout.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -30,24 +33,34 @@ const router = createBrowserRouter(
       <Route path="/jobs" element={<Jobs />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/about" element={<About />} />
-      <Route path="/resume-builder" element={<ResumeBuilder />} />
 
       <Route
-        path="/jobseeker/dashboard"
+        path="/jobseeker"
         element={
           <ProtectedRoute allowedRole="jobseeker">
-            <JobseekerDashboard />
+            <JobseekerLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route path="dashboard" element={<JobseekerDashboard />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="resume-builder" element={<ResumeBuilder />} />
+      </Route>
+
       <Route
-        path="/employer/dashboard"
+        path="/employer"
         element={
           <ProtectedRoute allowedRole="employer">
-            <EmployerDashboard />
+            <EmployerLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route path="dashboard" element={<EmployerDashboard />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="post-job" element={<h1>Post Job Page</h1>} />
+        <Route path="my-jobs" element={<h1>My Jobs Page</h1>} />
+      </Route>
+
     </Route>,
   ),
 );
