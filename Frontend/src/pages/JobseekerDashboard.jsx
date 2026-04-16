@@ -1,9 +1,10 @@
-const JobseekerDashboard = () => {
-  return (
-    <div>
-      Jobseeker Dashboard
-    </div>
-  )
-}
+import { Outlet } from "react-router-dom";
+import JobseekerSideBar from "../components/JobseekerSideBar";
 
-export default JobseekerDashboard
+const JobseekerDashboard = () => {
+  return <div className="flex">
+    Dashboard
+  </div>;
+};
+
+export default JobseekerDashboard;

@@ -3,8 +3,9 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import { BiGroup } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import Card from "../components/Card";
-
+import { useAuth } from "../context/AuthContext";
 const Home = () => {
+  const { user, authLoading } = useAuth();
   return (
     <>
       <div className="flex items-center justify-center  py-36 bg-gray-100 px-4">
@@ -19,19 +20,41 @@ const Home = () => {
           </p>
 
           <div className="mt-8 flex justify-center gap-4 flex-wrap">
-            <Link to="/jobs">
-              {" "}
-              <button className="bg-blue-600 text-white px-6 py-3 rounded-sm transition-all duration-300 hover:bg-blue-700 hover:scale-105 hover:shadow-lg cursor-pointer">
-                Browse Jobs
-              </button>
-            </Link>
+            {!authLoading && (
+              <Link to={user?.role === "employer" ? "employer/post-job" : "/jobs"}>
+                {" "}
+                <button className="bg-blue-600 text-white px-6 py-3 rounded-sm transition-all duration-300 hover:bg-blue-700 hover:scale-105 hover:shadow-lg cursor-pointer">
+                  {user
+                    ? user.role === "employer"
+                      ? "Post a Job"
+                      : "Browse Jobs"
+                    : "Browse Jobs"}
+                </button>
+              </Link>
+            )}
 
-            <Link to="/register">
-              {" "}
-              <button className="border border-gray-300 px-6 py-3 rounded-sm  transition-all duration-300  hover:scale-105 hover:shadow-lg  cursor-pointer">
-                Get Started
-              </button>
-            </Link>
+            {authLoading ? (
+              <div className="h-12 w-32 bg-gray-300 rounded-sm animate-pulse"></div>
+            ) : user ? (
+              <Link
+                to={
+                  user.role === "employer"
+                    ? "/employer/dashboard"
+                    : "/jobseeker/dashboard"
+                }
+              >
+                <button className="border border-gray-300 px-6 py-3 rounded-sm  transition-all duration-300  hover:scale-105 hover:shadow-lg  cursor-pointer">
+                  View Profile
+                </button>
+              </Link>
+            ) : (
+              <Link to="/register">
+                {" "}
+                <button className="border border-gray-300 px-6 py-3 rounded-sm  transition-all duration-300  hover:scale-105 hover:shadow-lg  cursor-pointer">
+                  Get Started
+                </button>
+              </Link>
+            )}
           </div>
         </div>
       </div>

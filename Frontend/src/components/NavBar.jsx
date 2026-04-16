@@ -9,7 +9,7 @@ const NavBar = () => {
   const navigate = useNavigate();
   const [isHamClicked, setIsHamClicked] = useState(false);
   const [isProfileClicked, setIsProfileClicked] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, logout, authLoading } = useAuth();
   const profileMenuRef = useRef(null);
   const mobileMenuRef = useRef(null);
   const hamButtonRef = useRef(null);
@@ -122,7 +122,9 @@ const NavBar = () => {
             <Link to="/jobs" onClick={closeMobileMenu}>
               <li>Browse Jobs</li>
             </Link>
-            {!user ? (
+            {authLoading ? (
+              <li className="text-gray-300">Loading...</li>
+            ) : !user ? (
               <>
                 <li>
                   <Link to="/login" onClick={closeMobileMenu}>
@@ -185,14 +187,16 @@ const NavBar = () => {
             </li>
 
             <li>
-              {!user && (
+              {!authLoading && !user && (
                 <Link to="/login">
                   <LoginButton />
                 </Link>
               )}
             </li>
             <li>
-              {!user ? (
+              {authLoading ? (
+                <div className="w-24 h-10" aria-hidden="true"></div>
+              ) : !user ? (
                 <Link to="/register">
                   <RegisterButton />
                 </Link>
