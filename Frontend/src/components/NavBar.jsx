@@ -5,6 +5,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+
 const NavBar = () => {
   const navigate = useNavigate();
   const [isHamClicked, setIsHamClicked] = useState(false);
@@ -83,7 +84,7 @@ const NavBar = () => {
 
   return (
     <>
-      <nav className="max-w-full p-5 font-bold border-b border-slate-200 flex justify-between items-center ">
+      <nav className="max-w-full px-5 py-3 font-bold border-b border-slate-200 flex justify-between items-center ">
         <Link to="/">
           {" "}
           <h1 className="text-2xl font-mono ">
@@ -93,12 +94,22 @@ const NavBar = () => {
         {/* Mobile hamburger */}
         <div
           ref={hamButtonRef}
-          className="w-6 h-5 flex flex-col gap-1 hamburger cursor-pointer md:hidden"
+          className="w-12 h-12 flex items-center justify-center flex-col gap-1 hamburger cursor-pointer md:hidden"
           onClick={() => setIsHamClicked(!isHamClicked)}
         >
-          <div className="bg-black w-6 h-1"></div>
-          <div className="bg-black w-5 h-1"></div>
-          <div className="bg-black w-4 h-1"></div>
+          {user ? (
+            <img
+              className="h-12 w-12 rounded-full object-cover ring-1 ring-blue-500 "
+              src={user.profileImage}
+              alt={user?.name || "Profile"}
+            />
+          ) : (
+            <>
+              <div className="bg-black w-6 h-1"></div>
+              <div className="bg-black w-5 h-1"></div>
+              <div className="bg-black w-4 h-1"></div>
+            </>
+          )}
         </div>
         <div
           ref={mobileMenuRef}
@@ -127,18 +138,38 @@ const NavBar = () => {
             ) : !user ? (
               <>
                 <li>
-                  <Link to="/login" onClick={closeMobileMenu}>
-                    <LoginButton />
+                  <Link
+                    to="/login"
+                    onClick={closeMobileMenu}
+                    className="inline-flex items-center justify-center cursor-pointer p-2 w-22 bg-blue-600 text-white font-bold rounded-sm transition-all duration-300 hover:bg-blue-700 hover:scale-105 hover:shadow-lg"
+                  >
+                    Login
                   </Link>
                 </li>
                 <li>
-                  <Link to="/register" onClick={closeMobileMenu}>
-                    <RegisterButton />
+                  <Link
+                    to="/register"
+                    onClick={closeMobileMenu}
+                    className="inline-flex items-center justify-center cursor-pointer p-2 outline-2 outline-slate-300 transition-all duration-300 hover:scale-105 hover:shadow-lg font-bold rounded-sm hover:bg-blue-600 hover:text-white hover:outline-0"
+                  >
+                    Register
                   </Link>
                 </li>
               </>
             ) : (
               <>
+                <li>
+                  <Link
+                    to={
+                      user.role === "employer"
+                        ? "/employer/profile"
+                        : "/jobseeker/profile"
+                    }
+                    onClick={closeMobileMenu}
+                  >
+                    Profile
+                  </Link>
+                </li>
                 <li>
                   <Link
                     to={
@@ -202,19 +233,24 @@ const NavBar = () => {
                 </Link>
               ) : (
                 <div
-                  className="w-10 rounded-full relative"
+                  className="relative w-12 h-12 rounded-full p-0.5 bg-linear-to-br from-blue-500 via-cyan-400 to-emerald-400 shadow-[0_10px_24px_rgba(59,130,246,0.28)]"
                   ref={profileMenuRef}
                 >
                   <button
-                    className="w-10 h-10 rounded-full overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300 hover:shadow-lg ring-3 ring-blue-600"
+                    className="group w-full h-full rounded-full overflow-hidden cursor-pointer bg-white ring-2 ring-white transition-transform duration-300 hover:scale-105 hover:shadow-xl"
                     onClick={() => {
                       setIsProfileClicked(!isProfileClicked);
                     }}
                   >
                     <img
-                      className="w-10 h-10 rounded-full"
-                      src={user.profileImage}
-                      alt=""
+                      className="h-full w-full rounded-full object-cover transition-transform duration-300 "
+                      src={
+                        user.profileImage ||
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                          user?.name || "User",
+                        )}&background=eff6ff&color=2563eb&size=256`
+                      }
+                      alt={user?.name || "Profile"}
                     />
                   </button>
                   {isProfileClicked && (
