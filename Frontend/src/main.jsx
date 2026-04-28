@@ -23,6 +23,9 @@ import EmployerDashboard from "./pages/EmployerDashboard.jsx";
 import JobseekerLayout from "./components/JobseekerLayout.jsx";
 import Profile from "./pages/Profile.jsx";
 import EmployerLayout from "./components/EmployerLayout.jsx";
+import axios from "axios";
+
+axios.defaults.withCredentials = true;
 
 const router = createBrowserRouter(
   createRoutesFromElements(
