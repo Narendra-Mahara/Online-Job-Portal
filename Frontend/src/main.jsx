@@ -27,6 +27,7 @@ import axios from "axios";
 import ViewJob from "./pages/ViewJob.jsx";
 import AppliedJob from "./pages/AppliedJob.jsx";
 import MyResume from "./pages/MyResume.jsx";
+import PostJob from "./pages/PostJob.jsx";
 
 axios.defaults.withCredentials = true;
 
@@ -82,7 +83,7 @@ const router = createBrowserRouter(
       >
         <Route path="dashboard" element={<EmployerDashboard />} />
         <Route path="profile" element={<Profile />} />
-        <Route path="post-job" element={<h1>Post Job Page</h1>} />
+        <Route path="post-job" element={<PostJob />} />
         <Route path="my-jobs" element={<h1>My Jobs Page</h1>} />
       </Route>
     </Route>,
