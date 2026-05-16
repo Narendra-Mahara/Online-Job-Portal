@@ -24,7 +24,16 @@ const JobseekerSideBar = () => {
         Profile
       </NavLink>
       <NavLink to="/resume-builder">Resume Builder</NavLink>
-      <NavLink to="/jobseeker/applied-jobs">Applied Jobs</NavLink>
+      <NavLink
+        to="/jobseeker/applied-jobs"
+        className={({ isActive }) =>
+          isActive
+            ? "text-blue-600 font-semibold underline underline-offset-2"
+            : ""
+        }
+      >
+        Applied Jobs
+      </NavLink>
       <NavLink to="/jobs">Browse Jobs</NavLink>
     </div>
   );
