@@ -39,7 +39,7 @@ const router = createBrowserRouter(
       <Route path="/contact" element={<Contact />} />
       <Route path="/about" element={<About />} />
       <Route path="/job/:jobId" element={<ViewJob />} />
-
+      {/* Jobseeker routes */}
       <Route
         path="/jobseeker"
         element={
@@ -51,9 +51,17 @@ const router = createBrowserRouter(
         <Route path="dashboard" element={<JobseekerDashboard />} />
         <Route path="profile" element={<Profile />} />
         <Route path="applied-jobs" element={<AppliedJob />} />
-        <Route path="resume-builder" element={<ResumeBuilder />} />
       </Route>
-
+      {/* Resume builder */}
+      <Route
+        path="/resume-builder"
+        element={
+          <ProtectedRoute allowedRole="jobseeker">
+            <ResumeBuilder />
+          </ProtectedRoute>
+        }
+      />
+      {/* Employer routes */}
       <Route
         path="/employer"
         element={
