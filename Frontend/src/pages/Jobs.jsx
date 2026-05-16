@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, Slide } from "react-toastify";
 export default function Jobs() {
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -47,6 +49,9 @@ export default function Jobs() {
     setSelectedJobId(jobId);
   };
 
+  const handleViewJob = async (jobId) => {
+    navigate(`/job/${jobId}`);
+  };
   return (
     <>
       {isModalOpen && (
@@ -209,9 +214,8 @@ export default function Jobs() {
                   <div className="flex items-center text-[15px] text-slate-600 gap-2.5">
                     <span className="text-lg opacity-80">📍</span>
                     <span className="font-medium">
-                      {job.location && !job.location.includes("India")
-                        ? job.location
-                        : "Kathmandu, Nepal"}
+                      {job.location}
+                        
                     </span>
                   </div>
                   <div className="flex items-center  text-[15px] text-slate-600 gap-1">
@@ -252,7 +256,10 @@ export default function Jobs() {
                   </div>
 
                   <div className="flex gap-4">
-                    <button className="flex-1 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50 hover:bg-slate-100 transition border border-slate-100">
+                    <button
+                      className="flex-1 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50 hover:bg-slate-100 transition border border-slate-100 cursor-pointer" 
+                      onClick={() => handleViewJob(job._id)}
+                    >
                       View details
                     </button>
                     <button

@@ -24,6 +24,7 @@ import JobseekerLayout from "./components/JobseekerLayout.jsx";
 import Profile from "./pages/Profile.jsx";
 import EmployerLayout from "./components/EmployerLayout.jsx";
 import axios from "axios";
+import ViewJob from "./pages/ViewJob.jsx";
 
 axios.defaults.withCredentials = true;
 
@@ -36,6 +37,7 @@ const router = createBrowserRouter(
       <Route path="/jobs" element={<Jobs />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/about" element={<About />} />
+      <Route path="/job/:jobId" element={<ViewJob />} />
 
       <Route
         path="/jobseeker"
@@ -63,7 +65,6 @@ const router = createBrowserRouter(
         <Route path="post-job" element={<h1>Post Job Page</h1>} />
         <Route path="my-jobs" element={<h1>My Jobs Page</h1>} />
       </Route>
-
     </Route>,
   ),
 );
