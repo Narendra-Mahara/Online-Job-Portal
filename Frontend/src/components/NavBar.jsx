@@ -171,6 +171,16 @@ const NavBar = () => {
                   </Link>
                 </li>
                 <li>
+                  {user.role === "jobseeker" && (
+                    <Link
+                      to={"/jobseeker/applied-jobs"}
+                      onClick={closeMobileMenu}
+                    >
+                      Applied Jobs
+                    </Link>
+                  )}
+                </li>
+                <li>
                   <Link
                     to={
                       user.role === "employer"
