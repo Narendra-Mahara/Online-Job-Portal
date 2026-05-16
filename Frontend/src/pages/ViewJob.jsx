@@ -2,8 +2,10 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast, Slide } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 const ViewJob = () => {
+  const { user } = useAuth();
   const { jobId } = useParams();
   const navigate = useNavigate();
   const [job, setJob] = useState(null);
@@ -251,7 +253,24 @@ const ViewJob = () => {
               </div>
 
               <button
-                onClick={() => setIsApplyModalOpen(true)}
+                onClick={() => {
+                  setIsApplyModalOpen(true);
+                  if (!user) {
+                    toast.error("Please log in to apply for jobs.", {
+                      position: "top-right",
+                      autoClose: 2000,
+                      hideProgressBar: false,
+                      closeOnClick: false,
+                      pauseOnHover: false,
+                      draggable: false,
+                      progress: undefined,
+                      theme: "light",
+                      transition: Slide,
+                    });
+                    navigate("/login");
+                    return;
+                  }
+                }}
                 className="w-full px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold transition shadow-md hover:shadow-lg mb-4 cursor-pointer"
               >
                 Apply Now

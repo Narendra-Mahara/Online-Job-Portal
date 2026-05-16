@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, Slide } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 export default function Jobs() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,6 +47,21 @@ export default function Jobs() {
   }, [isModalOpen]);
 
   const handleApplyJob = (jobId) => {
+    if (!user) {
+      toast.error("Please log in to apply for jobs.", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: false,
+        draggable: false,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
+      navigate("/login");
+      return;
+    }
     setIsModalOpen(true);
     setSelectedJobId(jobId);
   };
@@ -97,7 +114,7 @@ export default function Jobs() {
                       hideProgressBar: false,
                       closeOnClick: false,
                       pauseOnHover: false,
-                      draggable: true,
+                      draggable: false,
                       progress: undefined,
                       theme: "light",
                       transition: Slide,
@@ -213,10 +230,7 @@ export default function Jobs() {
                 <div className="space-y-3 mb-8">
                   <div className="flex items-center text-[15px] text-slate-600 gap-2.5">
                     <span className="text-lg opacity-80">📍</span>
-                    <span className="font-medium">
-                      {job.location}
-                        
-                    </span>
+                    <span className="font-medium">{job.location}</span>
                   </div>
                   <div className="flex items-center  text-[15px] text-slate-600 gap-1">
                     <span className="text-lg font-bold text-slate-400">
@@ -257,7 +271,7 @@ export default function Jobs() {
 
                   <div className="flex gap-4">
                     <button
-                      className="flex-1 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50 hover:bg-slate-100 transition border border-slate-100 cursor-pointer" 
+                      className="flex-1 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50 hover:bg-slate-100 transition border border-slate-100 cursor-pointer"
                       onClick={() => handleViewJob(job._id)}
                     >
                       View details
