@@ -26,6 +26,7 @@ import EmployerLayout from "./components/EmployerLayout.jsx";
 import axios from "axios";
 import ViewJob from "./pages/ViewJob.jsx";
 import AppliedJob from "./pages/AppliedJob.jsx";
+import MyResume from "./pages/MyResume.jsx";
 
 axios.defaults.withCredentials = true;
 
@@ -50,8 +51,17 @@ const router = createBrowserRouter(
       >
         <Route path="dashboard" element={<JobseekerDashboard />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="resume" element={<MyResume />} />
         <Route path="applied-jobs" element={<AppliedJob />} />
       </Route>
+      <Route
+        path="/resume"
+        element={
+          <ProtectedRoute allowedRole="jobseeker">
+            <MyResume />
+          </ProtectedRoute>
+        }
+      />
       {/* Resume builder */}
       <Route
         path="/resume-builder"
