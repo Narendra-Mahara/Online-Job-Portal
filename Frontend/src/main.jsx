@@ -23,6 +23,11 @@ import EmployerDashboard from "./pages/EmployerDashboard.jsx";
 import JobseekerLayout from "./components/JobseekerLayout.jsx";
 import Profile from "./pages/Profile.jsx";
 import EmployerLayout from "./components/EmployerLayout.jsx";
+import axios from "axios";
+import ViewJob from "./pages/ViewJob.jsx";
+import AppliedJob from "./pages/AppliedJob.jsx";
+
+axios.defaults.withCredentials = true;
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -33,7 +38,8 @@ const router = createBrowserRouter(
       <Route path="/jobs" element={<Jobs />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/about" element={<About />} />
-
+      <Route path="/job/:jobId" element={<ViewJob />} />
+      {/* Jobseeker routes */}
       <Route
         path="/jobseeker"
         element={
@@ -44,9 +50,18 @@ const router = createBrowserRouter(
       >
         <Route path="dashboard" element={<JobseekerDashboard />} />
         <Route path="profile" element={<Profile />} />
-        <Route path="resume-builder" element={<ResumeBuilder />} />
+        <Route path="applied-jobs" element={<AppliedJob />} />
       </Route>
-
+      {/* Resume builder */}
+      <Route
+        path="/resume-builder"
+        element={
+          <ProtectedRoute allowedRole="jobseeker">
+            <ResumeBuilder />
+          </ProtectedRoute>
+        }
+      />
+      {/* Employer routes */}
       <Route
         path="/employer"
         element={
@@ -60,7 +75,6 @@ const router = createBrowserRouter(
         <Route path="post-job" element={<h1>Post Job Page</h1>} />
         <Route path="my-jobs" element={<h1>My Jobs Page</h1>} />
       </Route>
-
     </Route>,
   ),
 );
