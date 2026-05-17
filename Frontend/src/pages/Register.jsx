@@ -181,7 +181,7 @@ const Register = () => {
             </div>
             <div className="flex justify-center w-full">
               <button
-                className="py-5 px-7 bg-blue-600 text-white text-xl rounded-sm flex items-center justify-center gap-5 font-bold transition-all duration-300 hover:bg-blue-700 hover:scale-105 hover:shadow-lg cursor-pointer"
+                className="bg-blue-600 text-white px-6 py-3 rounded-sm transition-all duration-300 hover:bg-blue-700 hover:scale-105 hover:shadow-lg cursor-pointer flex items-center gap-2"
                 type="submit"
                 disabled={pending}
               >
