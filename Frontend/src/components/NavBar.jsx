@@ -5,6 +5,15 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { FaRegFileAlt, FaRegUserCircle } from "react-icons/fa";
+import { FiLogOut, FiSearch } from "react-icons/fi";
+import {
+  MdDashboard,
+  MdHome,
+  MdInfoOutline,
+  MdOutlineContactMail,
+  MdWorkOutline,
+} from "react-icons/md";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -121,17 +130,45 @@ const NavBar = () => {
             X
           </div>
           <ul className="font-bold text-xl mt-10 ml-2 flex flex-col gap-3">
-            <Link to="/" onClick={closeMobileMenu}>
-              <li>Home</li>
+            <Link
+              to="/"
+              onClick={closeMobileMenu}
+              className="inline-flex items-center gap-2"
+            >
+              <li className="inline-flex items-center gap-2">
+                <MdHome />
+                Home
+              </li>
             </Link>
-            <Link to="/about" onClick={closeMobileMenu}>
-              <li>About Us</li>
+            <Link
+              to="/about"
+              onClick={closeMobileMenu}
+              className="inline-flex items-center gap-2"
+            >
+              <li className="inline-flex items-center gap-2">
+                <MdInfoOutline />
+                About Us
+              </li>
             </Link>
-            <Link to="/contact" onClick={closeMobileMenu}>
-              <li>Contact Us</li>
+            <Link
+              to="/contact"
+              onClick={closeMobileMenu}
+              className="inline-flex items-center gap-2"
+            >
+              <li className="inline-flex items-center gap-2">
+                <MdOutlineContactMail />
+                Contact Us
+              </li>
             </Link>
-            <Link to="/jobs" onClick={closeMobileMenu}>
-              <li>Browse Jobs</li>
+            <Link
+              to="/jobs"
+              onClick={closeMobileMenu}
+              className="inline-flex items-center gap-2"
+            >
+              <li className="inline-flex items-center gap-2">
+                <FiSearch />
+                Browse Jobs
+              </li>
             </Link>
             {authLoading ? (
               <li className="text-gray-300">Loading...</li>
@@ -166,20 +203,36 @@ const NavBar = () => {
                         : "/jobseeker/profile"
                     }
                     onClick={closeMobileMenu}
+                    className="inline-flex items-center gap-2"
                   >
+                    <FaRegUserCircle />
                     Profile
                   </Link>
                 </li>
-                <li>
-                  {user.role === "jobseeker" && (
+                {user.role === "jobseeker" && (
+                  <li>
+                    <Link
+                      to={"/jobseeker/resume"}
+                      onClick={closeMobileMenu}
+                      className="inline-flex items-center gap-2"
+                    >
+                      <FaRegFileAlt />
+                      My Resume
+                    </Link>
+                  </li>
+                )}
+                {user.role === "jobseeker" && (
+                  <li>
                     <Link
                       to={"/jobseeker/applied-jobs"}
                       onClick={closeMobileMenu}
+                      className="inline-flex items-center gap-2"
                     >
+                      <MdWorkOutline />
                       Applied Jobs
                     </Link>
-                  )}
-                </li>
+                  </li>
+                )}
                 <li>
                   <Link
                     to={
@@ -188,18 +241,21 @@ const NavBar = () => {
                         : "/jobseeker/dashboard"
                     }
                     onClick={closeMobileMenu}
+                    className="inline-flex items-center gap-2"
                   >
+                    <MdDashboard />
                     Dashboard
                   </Link>
                 </li>
                 <li>
                   <button
-                    className="font-bold bg-blue-600 text-white px-3 py-1 rounded-sm cursor-pointer hover:bg-blue-700 transition-colors duration-300"
+                    className="font-bold bg-blue-600 text-white px-3 py-1 rounded-sm cursor-pointer hover:bg-blue-700 transition-colors duration-300 inline-flex items-center gap-2"
                     onClick={() => {
                       closeMobileMenu();
                       handleLogout();
                     }}
                   >
+                    <FiLogOut />
                     Logout
                   </button>
                 </li>
@@ -274,15 +330,17 @@ const NavBar = () => {
                             ? "/employer/dashboard"
                             : "/jobseeker/dashboard"
                         }
-                        className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                        className="px-4 py-2 text-gray-800 hover:bg-gray-100 inline-flex items-center gap-2 w-full"
                       >
+                        <FaRegUserCircle />
                         Profile
                       </Link>
 
                       <button
-                        className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
+                        className="px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left inline-flex items-center gap-2"
                         onClick={handleLogout}
                       >
+                        <FiLogOut />
                         Logout
                       </button>
                     </div>
