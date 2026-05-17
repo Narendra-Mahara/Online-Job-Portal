@@ -29,6 +29,7 @@ import AppliedJob from "./pages/AppliedJob.jsx";
 import MyResume from "./pages/MyResume.jsx";
 import PostJob from "./pages/PostJob.jsx";
 import MyPostedJob from "./pages/MyPostedJob.jsx";
+import ViewSubmission from "./pages/ViewSubmission.jsx";
 
 axios.defaults.withCredentials = true;
 
@@ -74,6 +75,14 @@ const router = createBrowserRouter(
         }
       />
       {/* Employer routes */}
+      <Route
+        path="/job/submissions/:jobId"
+        element={
+          <ProtectedRoute allowedRole="employer">
+            <ViewSubmission />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/employer"
         element={
