@@ -21,8 +21,34 @@ const MyPostedJob = () => {
             withCredentials: true,
           },
         );
-        const data = response.data?.data;
-        setMyJobs(Array.isArray(data) ? data : []);
+        const data = Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+
+        // The jobs endpoint does not include applicant array/count, so derive it per job.
+        const jobsWithCounts = await Promise.all(
+          data.map(async (job) => {
+            try {
+              const applicationsResponse = await axios.get(
+                `${import.meta.env.VITE_API_BASE_URL}/application/job/${job._id}`,
+                {
+                  withCredentials: true,
+                },
+              );
+              const applications = Array.isArray(
+                applicationsResponse.data?.data,
+              )
+                ? applicationsResponse.data.data
+                : [];
+
+              return { ...job, applicantCount: applications.length };
+            } catch (applicationsError) {
+              return { ...job, applicantCount: 0 };
+            }
+          }),
+        );
+
+        setMyJobs(jobsWithCounts);
       } catch (fetchError) {
         setError("Unable to load your jobs right now.");
         setMyJobs([]);
@@ -150,7 +176,7 @@ const MyPostedJob = () => {
                       </td>
                       <td className="px-3 sm:px-5 py-3 sm:py-5">
                         <span className="inline-flex items-center rounded-full bg-blue-50 border border-blue-200 px-3 py-1 text-xs font-semibold text-blue-700">
-                          {job.applicants?.length || 0}
+                          {job.applicantCount ?? 0}
                         </span>
                       </td>
                       <td className="px-3 sm:px-5 py-3 sm:py-5">
@@ -166,13 +192,16 @@ const MyPostedJob = () => {
                       </td>
                       <td className="px-3 sm:px-5 py-3 sm:py-5 text-sm">
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center">
-                          <button className="bg-blue-600 font-semibold sm:mr-4 mb-2 sm:mb-0 px-4 py-2 rounded-md text-white hover:bg-blue-700 w-full sm:w-auto">
+                          <Link
+                            to={`/job/submissions/${job._id}`}
+                            className="bg-blue-600 font-semibold sm:mr-4 mb-2 sm:mb-0 px-4 py-2 rounded-md text-white hover:bg-blue-700 w-full sm:w-auto"
+                          >
                             View Submission
-                          </button>
+                          </Link>
                           <button
                             onClick={() => handleDeleteClick(job._id)}
                             disabled={job.status === "closed"}
-                            className="font-semibold bg-rose-500 text-white px-4 py-2 rounded-md hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+                            className="font-semibold bg-rose-500 text-white px-4 py-2 rounded-md hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto cursor-pointer"
                           >
                             Close Job
                           </button>
