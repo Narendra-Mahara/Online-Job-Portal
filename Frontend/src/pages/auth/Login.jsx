@@ -5,7 +5,7 @@ import { GoLock } from "react-icons/go";
 import { toast, Slide } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   let navigate = useNavigate();

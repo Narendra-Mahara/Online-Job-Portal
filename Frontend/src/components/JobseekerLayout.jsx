@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import JobseekerSideBar from "../components/JobseekerSideBar";
+import JobseekerSideBar from "./JobseekerSideBar";
 
 const JobseekerLayout = () => {
   return (
