@@ -148,9 +148,6 @@ export default function Jobs() {
       <div className="bg-slate-50 min-h-screen px-6 py-12 lg:px-20">
         {/* HEADER SECTION */}
         <div className="mb-10">
-          <p className="text-xs font-semibold tracking-widest text-blue-600 uppercase mb-3">
-            Job Listings
-          </p>
           <h1 className="text-4xl font-extrabold text-slate-900 mb-3">
             Explore active jobs from employers
           </h1>
@@ -180,7 +177,19 @@ export default function Jobs() {
         )}
 
         {/* JOB CARDS GRID */}
-        {!loading && !error && (
+        {!loading && !error && jobs.length === 0 && (
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white px-6 py-20 text-center shadow-sm">
+            <h2 className="text-2xl font-bold text-slate-900">
+              No jobs available
+            </h2>
+            <p className="mt-3 max-w-md text-sm text-slate-500">
+              There are no active jobs right now. Please check back later for
+              new opportunities.
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && jobs.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {jobs.map((job, index) => (
               <div
