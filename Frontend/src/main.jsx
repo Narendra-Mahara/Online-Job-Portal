@@ -30,73 +30,77 @@ import MyResume from "./pages/MyResume.jsx";
 import PostJob from "./pages/PostJob.jsx";
 import MyPostedJob from "./pages/MyPostedJob.jsx";
 import ViewSubmission from "./pages/ViewSubmission.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 axios.defaults.withCredentials = true;
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<Layout />}>
-      <Route path="" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/jobs" element={<Jobs />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/job/:jobId" element={<ViewJob />} />
-      {/* Jobseeker routes */}
-      <Route
-        path="/jobseeker"
-        element={
-          <ProtectedRoute allowedRole="jobseeker">
-            <JobseekerLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="dashboard" element={<JobseekerDashboard />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="resume" element={<MyResume />} />
-        <Route path="applied-jobs" element={<AppliedJob />} />
+    
+      <Route path="/" element={<Layout />}>
+        <Route path="" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/job/:jobId" element={<ViewJob />} />
+        {/* Jobseeker routes */}
+        <Route
+          path="/jobseeker"
+          element={
+            <ProtectedRoute allowedRole="jobseeker">
+              <JobseekerLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<JobseekerDashboard />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="resume" element={<MyResume />} />
+          <Route path="applied-jobs" element={<AppliedJob />} />
+        </Route>
+        <Route
+          path="/resume"
+          element={
+            <ProtectedRoute allowedRole="jobseeker">
+              <MyResume />
+            </ProtectedRoute>
+          }
+        />
+        {/* Resume builder */}
+        <Route
+          path="/resume-builder"
+          element={
+            <ProtectedRoute allowedRole="jobseeker">
+              <ResumeBuilder />
+            </ProtectedRoute>
+          }
+        />
+        {/* Employer routes */}
+        <Route
+          path="/job/submissions/:jobId"
+          element={
+            <ProtectedRoute allowedRole="employer">
+              <ViewSubmission />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/employer"
+          element={
+            <ProtectedRoute allowedRole="employer">
+              <EmployerLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<EmployerDashboard />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="post-job" element={<PostJob />} />
+          <Route path="my-jobs" element={<MyPostedJob />} />
+        </Route>
+      <Route path="*" element={<NotFound />} />
       </Route>
-      <Route
-        path="/resume"
-        element={
-          <ProtectedRoute allowedRole="jobseeker">
-            <MyResume />
-          </ProtectedRoute>
-        }
-      />
-      {/* Resume builder */}
-      <Route
-        path="/resume-builder"
-        element={
-          <ProtectedRoute allowedRole="jobseeker">
-            <ResumeBuilder />
-          </ProtectedRoute>
-        }
-      />
-      {/* Employer routes */}
-      <Route
-        path="/job/submissions/:jobId"
-        element={
-          <ProtectedRoute allowedRole="employer">
-            <ViewSubmission />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/employer"
-        element={
-          <ProtectedRoute allowedRole="employer">
-            <EmployerLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="dashboard" element={<EmployerDashboard />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="post-job" element={<PostJob />} />
-        <Route path="my-jobs" element={<MyPostedJob />} />
-      </Route>
-    </Route>,
+   
   ),
 );
 
