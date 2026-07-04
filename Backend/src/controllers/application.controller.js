@@ -124,6 +124,10 @@ const getApplicationsByJob = async (req, res) => {
       job: req.params.id,
     })
       .populate("resume")
+      .populate({
+        path: "applicant",
+        select: "name email phone profileImage",
+      })
       .sort({ createdAt: -1 });
     if (applications.length === 0) {
       return res

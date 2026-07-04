@@ -21,6 +21,7 @@ const ViewSubmission = () => {
   const normalizeSubmission = (submission) => {
     const resume = submission.resume || {};
     const personalInfo = resume.personalInfo || {};
+    const applicant = submission.applicant || {};
     const topSkills = Array.isArray(resume.skills)
       ? resume.skills.slice(0, 4)
       : [];
@@ -40,9 +41,9 @@ const ViewSubmission = () => {
 
     return {
       id: submission._id,
-      fullName: personalInfo.fullName || "Unknown candidate",
-      email: personalInfo.email || "-",
-      phone: personalInfo.phone || "No phone",
+      fullName: applicant.name || personalInfo.fullName || "Unknown candidate",
+      email: applicant.email || personalInfo.email || "-",
+      phone: applicant.phone || personalInfo.phone || "No phone",
       summary: resume.summary || "No summary provided",
       topSkills,
       educationDegree: latestEducation?.degree || "Degree",
