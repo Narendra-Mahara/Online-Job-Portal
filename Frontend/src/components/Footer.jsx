@@ -27,10 +27,10 @@ const Footer = () => {
           <h1 className="font-bold">For Employers</h1>
           <ul className="text-gray-600 text-sm">
             <li>
-              <Link to="#">Post job</Link>
+              <Link to="/employer/post-job">Post job</Link>
             </li>
             <li>
-              <Link to="#">Dashboard</Link>
+              <Link to="/employer/dashboard">Dashboard</Link>
             </li>
           </ul>
         </div>
