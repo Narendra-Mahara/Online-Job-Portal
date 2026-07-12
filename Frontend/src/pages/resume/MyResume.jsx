@@ -13,6 +13,27 @@ const MyResume = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [hasApplications, setHasApplications] = useState(false);
 
+  const formatDate = (value) => {
+    if (!value) {
+      return "-";
+    }
+
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "-" : date.toLocaleDateString();
+  };
+
+  const formatRange = (start, end, fallback = "-") => {
+    if (!start && !end) {
+      return fallback;
+    }
+
+    if (start && end) {
+      return `${start} - ${end}`;
+    }
+
+    return start || end || fallback;
+  };
+
   const fetchResumes = async () => {
     try {
       setLoading(true);
@@ -93,19 +114,21 @@ const MyResume = () => {
   return (
     <div className="min-h-screen w-full bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-6xl">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-slate-900">My Resume</h1>
-          <div className="flex gap-2">
-            <button
-              disabled={Boolean(resume)}
-              onClick={() => navigate("/resume-builder")}
-              className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:opacity-50 transition"
-              title={resume ? "You already have a resume" : "Create a resume"}
-            >
-              Create Resume
-            </button>
-            <Link to="/resume-builder" className="hidden" />
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">My Resume</h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Review the full resume data stored in your profile.
+            </p>
           </div>
+          <button
+            disabled={Boolean(resume)}
+            onClick={() => navigate("/resume-builder")}
+            className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:opacity-50"
+            title={resume ? "You already have a resume" : "Create a resume"}
+          >
+            Create Resume
+          </button>
         </div>
 
         {loading && (
@@ -126,7 +149,7 @@ const MyResume = () => {
             <div className="mt-4">
               <button
                 onClick={() => navigate("/resume-builder")}
-                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
                 Create your first resume
               </button>
@@ -135,90 +158,282 @@ const MyResume = () => {
         )}
 
         {!loading && !error && resume && (
-          <div className="grid grid-cols-1 gap-4">
-            <div
-              key={resume._id}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-lg font-semibold text-slate-900">
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="max-w-3xl">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Resume Overview
+                  </p>
+                  <h2 className="mt-1 text-2xl font-bold text-slate-900">
                     {resume.personalInfo?.fullName || "Unnamed"}
                   </h2>
-                  <p className="text-sm text-slate-500">
-                    {resume.personalInfo?.email} • {resume.personalInfo?.phone}
-                  </p>
-                  <p className="mt-3 text-sm text-slate-600">
-                    {resume.summary}
+                  <p className="mt-2 text-sm text-slate-600">
+                    {resume.summary || "No summary provided."}
                   </p>
                 </div>
 
-                <div className="flex flex-col items-end gap-2">
-                  <p className="text-xs text-slate-400">
-                    {new Date(resume.createdAt).toLocaleDateString()}
-                  </p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleDelete(resume._id)}
-                      disabled={hasApplications}
-                      title={
-                        hasApplications
-                          ? "Unable to delete resume because you have already applied for a job"
-                          : "Delete resume"
-                      }
-                      className="rounded-md border border-rose-200 px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50 transition"
-                    >
-                      Delete
-                    </button>
+                <div className="flex flex-col items-end gap-2 text-right">
+                  <div className="text-xs text-slate-400">
+                    <p>Created: {formatDate(resume.createdAt)}</p>
                   </div>
-                </div>
-              </div>
-
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-700">
-                    Education
-                  </h3>
-                  <ul className="mt-2 text-sm text-slate-600">
-                    {resume.education?.map((e, i) => (
-                      <li key={i} className="mb-1">
-                        <strong>{e.institution}</strong> — {e.degree}{" "}
-                        {e.startYear &&
-                          `(${e.startYear}${e.endYear ? ` - ${e.endYear}` : ""})`}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-700">
-                    Experience
-                  </h3>
-                  <ul className="mt-2 text-sm text-slate-600">
-                    {resume.experience?.map((ex, i) => (
-                      <li key={i} className="mb-1">
-                        <strong>{ex.role}</strong> @ {ex.company}{" "}
-                        {ex.startDate &&
-                          `(${ex.startDate}${ex.endDate ? ` - ${ex.endDate}` : ""})`}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {resume.skills?.map((s, i) => (
-                  <span
-                    key={i}
-                    className="rounded-full bg-slate-300 px-3 py-1 text-sm text-slate-700"
+                  <button
+                    onClick={() => handleDelete(resume._id)}
+                    disabled={hasApplications}
+                    title={
+                      hasApplications
+                        ? "Unable to delete resume because you have already applied for a job"
+                        : "Delete resume"
+                    }
+                    className="rounded-md border border-rose-200 px-3 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {s}
-                  </span>
-                ))}
+                    Delete
+                  </button>
+                </div>
               </div>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+                  Personal Information
+                </h3>
+                <div className="mt-4 space-y-2 text-sm text-slate-700">
+                  <p>
+                    <span className="font-semibold text-slate-900">Name:</span>{" "}
+                    {resume.personalInfo?.fullName || "-"}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-slate-900">Email:</span>{" "}
+                    {resume.personalInfo?.email || "-"}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-slate-900">Phone:</span>{" "}
+                    {resume.personalInfo?.phone || "-"}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-slate-900">
+                      Address:
+                    </span>{" "}
+                    {resume.personalInfo?.address || "-"}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-slate-900">
+                      LinkedIn:
+                    </span>{" "}
+                    {resume.personalInfo?.linkedIn ? (
+                      <a
+                        href={resume.personalInfo.linkedIn}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="break-all text-blue-600 hover:underline"
+                      >
+                        {resume.personalInfo.linkedIn}
+                      </a>
+                    ) : (
+                      "-"
+                    )}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-slate-900">
+                      GitHub:
+                    </span>{" "}
+                    {resume.personalInfo?.github ? (
+                      <a
+                        href={resume.personalInfo.github}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="break-all text-blue-600 hover:underline"
+                      >
+                        {resume.personalInfo.github}
+                      </a>
+                    ) : (
+                      "-"
+                    )}
+                  </p>
+                </div>
+              </section>
+
+              <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+                  Skills
+                </h3>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {resume.skills?.length > 0 ? (
+                    resume.skills.map((skill, index) => (
+                      <span
+                        key={`${skill}-${index}`}
+                        className="rounded-full bg-slate-200 px-3 py-1 text-sm font-medium text-slate-700"
+                      >
+                        {skill}
+                      </span>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-500">No skills listed.</p>
+                  )}
+                </div>
+              </section>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+                  Education
+                </h3>
+                <div className="mt-4 space-y-3">
+                  {resume.education?.length > 0 ? (
+                    resume.education.map((education, index) => (
+                      <div
+                        key={`${education.institution || "education"}-${index}`}
+                        className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                      >
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div>
+                            <p className="font-semibold text-slate-900">
+                              {education.degree || "Degree"}
+                            </p>
+                            <p className="text-sm text-slate-600">
+                              {education.institution || "Institution"}
+                            </p>
+                          </div>
+                          <p className="text-xs text-slate-500">
+                            {formatRange(
+                              education.startYear,
+                              education.endYear,
+                            )}
+                          </p>
+                        </div>
+                        <div className="mt-3 space-y-1 text-sm text-slate-700">
+                          <p>
+                            <span className="font-semibold text-slate-900">
+                              Field:
+                            </span>{" "}
+                            {education.fieldOfStudy || "-"}
+                          </p>
+                          <p>
+                            <span className="font-semibold text-slate-900">
+                              Grade:
+                            </span>{" "}
+                            {education.grade || "-"}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-500">
+                      No education listed.
+                    </p>
+                  )}
+                </div>
+              </section>
+
+              <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+                  Experience
+                </h3>
+                <div className="mt-4 space-y-3">
+                  {resume.experience?.length > 0 ? (
+                    resume.experience.map((experience, index) => (
+                      <div
+                        key={`${experience.company || "experience"}-${index}`}
+                        className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                      >
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div>
+                            <p className="font-semibold text-slate-900">
+                              {experience.role || "Role"}
+                            </p>
+                            <p className="text-sm text-slate-600">
+                              {experience.company || "Company"}
+                            </p>
+                          </div>
+                          <p className="text-xs text-slate-500">
+                            {formatRange(
+                              experience.startDate,
+                              experience.endDate,
+                            )}
+                          </p>
+                        </div>
+                        {experience.description && (
+                          <p className="mt-3 text-sm leading-6 text-slate-700">
+                            {experience.description}
+                          </p>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-500">
+                      No experience listed.
+                    </p>
+                  )}
+                </div>
+              </section>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+                  Projects
+                </h3>
+                <div className="mt-4 space-y-3">
+                  {resume.projects?.length > 0 ? (
+                    resume.projects.map((project, index) => (
+                      <div
+                        key={`${project.title || "project"}-${index}`}
+                        className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                      >
+                        <p className="font-semibold text-slate-900">
+                          {project.title || "Project"}
+                        </p>
+                        {project.description && (
+                          <p className="mt-2 text-sm leading-6 text-slate-700">
+                            {project.description}
+                          </p>
+                        )}
+                        {project.link ? (
+                          <a
+                            href={project.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-2 inline-block break-all text-sm text-blue-600 hover:underline"
+                          >
+                            {project.link}
+                          </a>
+                        ) : null}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-500">
+                      No projects listed.
+                    </p>
+                  )}
+                </div>
+              </section>
+
+              <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+                  Resume Notes
+                </h3>
+                <div className="mt-4 space-y-2 text-sm text-slate-700">
+                  <p>
+                    <span className="font-semibold text-slate-900">
+                      Summary:
+                    </span>{" "}
+                    {resume.summary || "-"}
+                  </p>
+
+                  <p>
+                    <span className="font-semibold text-slate-900">
+                      Created At:
+                    </span>{" "}
+                    {formatDate(resume.createdAt)}
+                  </p>
+                </div>
+              </section>
             </div>
           </div>
         )}
+
         {confirmOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div
@@ -245,7 +460,7 @@ const MyResume = () => {
                 <button
                   onClick={confirmDelete}
                   disabled={isDeleting}
-                  className="rounded-md bg-rose-600 px-3 py-2 text-sm font-semibold text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50 transition"
+                  className="rounded-md bg-rose-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isDeleting ? "Deleting..." : "Delete"}
                 </button>
