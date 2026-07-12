@@ -5,7 +5,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { FaRegFileAlt, FaRegUserCircle } from "react-icons/fa";
+import { FaRegFileAlt, FaRegUserCircle, FaBriefcase } from "react-icons/fa";
 import { FiLogOut, FiSearch } from "react-icons/fi";
 import {
   MdDashboard,
@@ -140,36 +140,31 @@ const NavBar = () => {
                 Home
               </li>
             </Link>
-            <Link
-              to="/about"
-              onClick={closeMobileMenu}
-              className="inline-flex items-center gap-2"
-            >
-              <li className="inline-flex items-center gap-2">
-                <MdInfoOutline />
-                About Us
-              </li>
-            </Link>
-            <Link
-              to="/contact"
-              onClick={closeMobileMenu}
-              className="inline-flex items-center gap-2"
-            >
-              <li className="inline-flex items-center gap-2">
-                <MdOutlineContactMail />
-                Contact Us
-              </li>
-            </Link>
-            <Link
-              to="/jobs"
-              onClick={closeMobileMenu}
-              className="inline-flex items-center gap-2"
-            >
-              <li className="inline-flex items-center gap-2">
-                <FiSearch />
-                Browse Jobs
-              </li>
-            </Link>
+            {user?.role === "employer" && (
+              <>
+                <Link
+                  to="/employer/my-jobs"
+                  onClick={closeMobileMenu}
+                  className="inline-flex items-center gap-2"
+                >
+                  <li className="inline-flex items-center gap-2">
+                    <MdWorkOutline className="text-lg" />
+                    My Jobs
+                  </li>
+                </Link>
+                <Link
+                  to="/employer/post-job"
+                  onClick={closeMobileMenu}
+                  className="inline-flex items-center gap-2"
+                >
+                  <li className="inline-flex items-center gap-2">
+                    <FaBriefcase />
+                    Post Job
+                  </li>
+                </Link>
+              </>
+            )}
+
             {authLoading ? (
               <li className="text-gray-300">Loading...</li>
             ) : !user ? (
@@ -218,6 +213,18 @@ const NavBar = () => {
                     >
                       <FaRegFileAlt />
                       My Resume
+                    </Link>
+                  </li>
+                )}
+                {user.role === "jobseeker" && (
+                  <li>
+                    <Link
+                      to="/jobs"
+                      onClick={closeMobileMenu}
+                      className="inline-flex items-center gap-2"
+                    >
+                      <FiSearch />
+                      Browse Jobs
                     </Link>
                   </li>
                 )}
