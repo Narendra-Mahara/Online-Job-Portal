@@ -9,6 +9,7 @@ const ViewSubmission = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
+  const [expandedSubmissions, setExpandedSubmissions] = useState([]);
 
   const statusStyles = {
     pending: "bg-amber-50 text-amber-700 border-amber-200",
@@ -22,16 +23,17 @@ const ViewSubmission = () => {
     const resume = submission.resume || {};
     const personalInfo = resume.personalInfo || {};
     const applicant = submission.applicant || {};
-    const topSkills = Array.isArray(resume.skills)
-      ? resume.skills.slice(0, 4)
-      : [];
+    const skills = Array.isArray(resume.skills) ? resume.skills : [];
+    const topSkills = skills.slice(0, 4);
     const educationList = Array.isArray(resume.education)
       ? resume.education
       : [];
+    const experienceList = Array.isArray(resume.experience)
+      ? resume.experience
+      : [];
+    const projectsList = Array.isArray(resume.projects) ? resume.projects : [];
     const latestEducation = educationList[0] || null;
-    const experienceCount = Array.isArray(resume.experience)
-      ? resume.experience.length
-      : 0;
+    const experienceCount = experienceList.length;
 
     const appliedDate = submission.createdAt
       ? new Date(submission.createdAt).toISOString().slice(0, 10)
@@ -44,8 +46,15 @@ const ViewSubmission = () => {
       fullName: applicant.name || personalInfo.fullName || "Unknown candidate",
       email: applicant.email || personalInfo.email || "-",
       phone: applicant.phone || personalInfo.phone || "No phone",
+      address: personalInfo.address || "-",
+      linkedIn: personalInfo.linkedIn || "",
+      github: personalInfo.github || "",
       summary: resume.summary || "No summary provided",
+      skills,
       topSkills,
+      educationList,
+      experienceList,
+      projectsList,
       educationDegree: latestEducation?.degree || "Degree",
       educationInstitution:
         latestEducation?.institution || "Institution not provided",
@@ -58,6 +67,14 @@ const ViewSubmission = () => {
       currentStatus,
       isStatusLocked,
     };
+  };
+
+  const toggleSubmission = (submissionId) => {
+    setExpandedSubmissions((current) =>
+      current.includes(submissionId)
+        ? current.filter((id) => id !== submissionId)
+        : [...current, submissionId],
+    );
   };
 
   useEffect(() => {
@@ -115,18 +132,18 @@ const ViewSubmission = () => {
   };
 
   return (
-    <div className="bg-white min-h-screen w-full py-10 px-0">
+    <div className="min-h-screen w-full bg-white px-0 py-10">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Submissions</h1>
-            <p className="text-slate-500 mt-1 text-sm sm:text-base">
+            <p className="mt-1 text-sm text-slate-500 sm:text-base">
               Review applicants for this job and update their status.
             </p>
           </div>
           <Link
             to="/employer/my-jobs"
-            className="inline-flex items-center rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200 transition"
+            className="inline-flex items-center rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200"
           >
             Back to My Jobs
           </Link>
@@ -146,10 +163,10 @@ const ViewSubmission = () => {
 
         {!loading && !error && submissions.length === 0 && (
           <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-            <h2 className="text-xl font-semibold text-slate-900 mb-2">
+            <h2 className="mb-2 text-xl font-semibold text-slate-900">
               No submissions yet
             </h2>
-            <p className="text-slate-500 max-w-lg mx-auto">
+            <p className="mx-auto max-w-lg text-slate-500">
               Once candidates apply to this job, their submissions will appear
               here.
             </p>
@@ -157,230 +174,331 @@ const ViewSubmission = () => {
         )}
 
         {!loading && !error && submissions.length > 0 && (
-          <>
-            <div className="md:hidden space-y-4">
-              {submissions.map((submission) => {
-                const normalized = normalizeSubmission(submission);
+          <div className="space-y-4">
+            {submissions.map((submission) => {
+              const normalized = normalizeSubmission(submission);
+              const isExpanded = expandedSubmissions.includes(normalized.id);
 
-                return (
-                  <div
-                    key={normalized.id}
-                    className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+              return (
+                <div
+                  key={normalized.id}
+                  className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleSubmission(normalized.id)}
+                    className="flex w-full items-start justify-between gap-4 px-4 py-4 text-left transition hover:bg-slate-50/80 sm:px-5"
+                    aria-expanded={isExpanded}
+                    aria-controls={`submission-panel-${normalized.id}`}
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <h3 className="text-base font-semibold text-slate-900">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-base font-semibold text-slate-900 sm:text-lg">
                           {normalized.fullName}
                         </h3>
-                        <p className="text-xs text-slate-500 mt-1">
-                          {normalized.email}
-                        </p>
-                      </div>
-                      <span
-                        className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold capitalize ${statusStyles[normalized.currentStatus] || statusStyles.pending}`}
-                      >
-                        {normalized.currentStatus}
-                      </span>
-                    </div>
-
-                    <p className="text-sm text-slate-600 mt-3">
-                      {normalized.summary}
-                    </p>
-
-                    <div className="mt-3 grid grid-cols-1 gap-2 text-sm text-slate-700">
-                      <p>
-                        <span className="font-semibold text-slate-800">
-                          Phone:
-                        </span>{" "}
-                        {normalized.phone}
-                      </p>
-                      <p>
-                        <span className="font-semibold text-slate-800">
-                          Education:
-                        </span>{" "}
-                        {normalized.hasEducation
-                          ? `${normalized.educationDegree} - ${normalized.educationInstitution}`
-                          : "-"}
-                      </p>
-                      <p>
-                        <span className="font-semibold text-slate-800">
-                          Experience:
-                        </span>{" "}
-                        {normalized.experienceLabel}
-                      </p>
-                      <p>
-                        <span className="font-semibold text-slate-800">
-                          Applied On:
-                        </span>{" "}
-                        {normalized.appliedDate}
-                      </p>
-                    </div>
-
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {normalized.topSkills.length > 0 ? (
-                        normalized.topSkills.map((skill) => (
-                          <span
-                            key={`${normalized.id}-${skill}`}
-                            className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700"
-                          >
-                            {skill}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-sm text-slate-500">
-                          No skills listed
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="mt-4">
-                      <label className="block text-xs font-semibold text-slate-500 mb-1">
-                        Update Status
-                      </label>
-                      <select
-                        value={normalized.currentStatus}
-                        onChange={(event) =>
-                          handleStatusUpdate(normalized.id, event.target.value)
-                        }
-                        disabled={
-                          updatingId === normalized.id ||
-                          normalized.isStatusLocked
-                        }
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        {statusOptions.map((statusOption) => (
-                          <option key={statusOption} value={statusOption}>
-                            {statusOption.charAt(0).toUpperCase() +
-                              statusOption.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="hidden md:block w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-full divide-y divide-slate-200">
-                  <thead className="bg-slate-50">
-                    <tr>
-                      <th className="px-4 sm:px-5 py-3 sm:py-4 text-left text-sm font-semibold text-slate-500">
-                        Applicant
-                      </th>
-                      <th className="px-4 sm:px-5 py-3 sm:py-4 text-left text-sm font-semibold text-slate-500">
-                        Contact
-                      </th>
-                      <th className="px-4 sm:px-5 py-3 sm:py-4 text-left text-sm font-semibold text-slate-500">
-                        Skills
-                      </th>
-                      <th className="px-4 sm:px-5 py-3 sm:py-4 text-left text-sm font-semibold text-slate-500">
-                        Education
-                      </th>
-                      <th className="px-4 sm:px-5 py-3 sm:py-4 text-left text-sm font-semibold text-slate-500">
-                        Experience
-                      </th>
-                      <th className="px-4 sm:px-5 py-3 sm:py-4 text-left text-sm font-semibold text-slate-500">
-                        Applied On
-                      </th>
-                      <th className="px-4 sm:px-5 py-3 sm:py-4 text-left text-sm font-semibold text-slate-500">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 bg-white">
-                    {submissions.map((submission) => {
-                      const normalized = normalizeSubmission(submission);
-
-                      return (
-                        <tr
-                          key={normalized.id}
-                          className="hover:bg-slate-50/70 transition"
+                        <span
+                          className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold capitalize ${statusStyles[normalized.currentStatus] || statusStyles.pending}`}
                         >
-                          <td className="px-4 sm:px-5 py-4 sm:py-5 align-top">
-                            <div className="text-sm font-semibold text-slate-900">
-                              {normalized.fullName}
-                            </div>
-                            <div className="text-xs text-slate-500 mt-1 line-clamp-2">
-                              {normalized.summary}
-                            </div>
-                          </td>
-                          <td className="px-4 sm:px-5 py-4 sm:py-5 align-top text-sm text-slate-700">
-                            <div>{normalized.email}</div>
-                            <div className="text-xs text-slate-500 mt-1">
-                              {normalized.phone}
-                            </div>
-                          </td>
-                          <td className="px-4 sm:px-5 py-4 sm:py-5 align-top">
-                            <div className="flex flex-wrap gap-2">
-                              {normalized.topSkills.length > 0 ? (
-                                normalized.topSkills.map((skill) => (
+                          {normalized.currentStatus}
+                        </span>
+                      </div>
+                      <p className="mt-1 truncate text-sm text-slate-500">
+                        {normalized.email}
+                      </p>
+                      <p className="mt-2 line-clamp-2 text-sm text-slate-600">
+                        {normalized.summary}
+                      </p>
+                    </div>
+
+                    <div className="flex shrink-0 items-center gap-3 pt-1 text-slate-500">
+                      <span className="hidden text-xs font-medium uppercase tracking-wider sm:inline">
+                        {isExpanded ? "Collapse" : "Expand"}
+                      </span>
+                      <svg
+                        className={`h-5 w-5 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  </button>
+
+                  <div
+                    id={`submission-panel-${normalized.id}`}
+                    className={`${isExpanded ? "block" : "hidden"} border-t border-slate-200 bg-slate-50/60 px-4 py-4 sm:px-5 sm:py-5`}
+                  >
+                    <div className="grid gap-4 lg:grid-cols-3">
+                      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                        <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                          Personal Info
+                        </h4>
+                        <div className="space-y-1 text-sm text-slate-700">
+                          <p>
+                            <span className="font-semibold text-slate-800">
+                              Name:
+                            </span>{" "}
+                            {normalized.fullName}
+                          </p>
+                          <p>
+                            <span className="font-semibold text-slate-800">
+                              Email:
+                            </span>{" "}
+                            {normalized.email}
+                          </p>
+                          <p>
+                            <span className="font-semibold text-slate-800">
+                              Phone:
+                            </span>{" "}
+                            {normalized.phone}
+                          </p>
+                          <p>
+                            <span className="font-semibold text-slate-800">
+                              Address:
+                            </span>{" "}
+                            {normalized.address}
+                          </p>
+                          {normalized.linkedIn && (
+                            <p className="break-all">
+                              <span className="font-semibold text-slate-800">
+                                LinkedIn:
+                              </span>{" "}
+                              <a
+                                href={normalized.linkedIn}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-blue-600 hover:underline"
+                              >
+                                {normalized.linkedIn}
+                              </a>
+                            </p>
+                          )}
+                          {normalized.github && (
+                            <p className="break-all">
+                              <span className="font-semibold text-slate-800">
+                                GitHub:
+                              </span>{" "}
+                              <a
+                                href={normalized.github}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-blue-600 hover:underline"
+                              >
+                                {normalized.github}
+                              </a>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                        <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                          Education & Experience
+                        </h4>
+                        <div className="space-y-3 text-sm text-slate-700">
+                          <div>
+                            <p className="mb-1 font-semibold text-slate-800">
+                              Education
+                            </p>
+                            {normalized.educationList.length > 0 ? (
+                              <ul className="space-y-2">
+                                {normalized.educationList.map(
+                                  (education, index) => (
+                                    <li
+                                      key={`${normalized.id}-edu-${index}`}
+                                      className="rounded-lg bg-slate-50 p-3"
+                                    >
+                                      <div className="font-medium text-slate-800">
+                                        {education.degree || "Degree"}
+                                      </div>
+                                      <div className="text-slate-600">
+                                        {education.institution || "Institution"}
+                                      </div>
+                                      <div className="mt-1 text-xs text-slate-500">
+                                        {[
+                                          education.fieldOfStudy,
+                                          education.grade,
+                                        ]
+                                          .filter(Boolean)
+                                          .join(" • ") ||
+                                          "No additional education details"}
+                                      </div>
+                                      <div className="mt-1 text-xs text-slate-500">
+                                        {education.startYear || ""}
+                                        {education.endYear
+                                          ? ` - ${education.endYear}`
+                                          : ""}
+                                      </div>
+                                    </li>
+                                  ),
+                                )}
+                              </ul>
+                            ) : (
+                              <p className="text-slate-500">-</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <p className="mb-1 font-semibold text-slate-800">
+                              Experience
+                            </p>
+                            {normalized.experienceList.length > 0 ? (
+                              <ul className="space-y-2">
+                                {normalized.experienceList.map(
+                                  (experience, index) => (
+                                    <li
+                                      key={`${normalized.id}-exp-${index}`}
+                                      className="rounded-lg bg-slate-50 p-3"
+                                    >
+                                      <div className="font-medium text-slate-800">
+                                        {experience.role || "Role"}
+                                      </div>
+                                      <div className="text-slate-600">
+                                        {experience.company || "Company"}
+                                      </div>
+                                      <div className="mt-1 text-xs text-slate-500">
+                                        {experience.startDate || ""}
+                                        {experience.endDate
+                                          ? ` - ${experience.endDate}`
+                                          : ""}
+                                      </div>
+                                      {experience.description && (
+                                        <p className="mt-2 text-xs text-slate-500">
+                                          {experience.description}
+                                        </p>
+                                      )}
+                                    </li>
+                                  ),
+                                )}
+                              </ul>
+                            ) : (
+                              <p className="text-slate-500">-</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                        <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                          Skills & Projects
+                        </h4>
+                        <div className="space-y-3 text-sm text-slate-700">
+                          <div>
+                            <p className="mb-2 font-semibold text-slate-800">
+                              Skills
+                            </p>
+                            {normalized.skills.length > 0 ? (
+                              <div className="flex flex-wrap gap-2">
+                                {normalized.skills.map((skill) => (
                                   <span
-                                    key={`${normalized.id}-${skill}`}
+                                    key={`${normalized.id}-skill-${skill}`}
                                     className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700"
                                   >
                                     {skill}
                                   </span>
-                                ))
-                              ) : (
-                                <span className="text-sm text-slate-500">
-                                  -
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-4 sm:px-5 py-4 sm:py-5 align-top text-sm text-slate-700">
-                            {normalized.hasEducation ? (
-                              <>
-                                <div className="font-medium text-slate-800">
-                                  {normalized.educationDegree}
-                                </div>
-                                <div className="text-xs text-slate-500 mt-1">
-                                  {normalized.educationInstitution}
-                                </div>
-                              </>
+                                ))}
+                              </div>
                             ) : (
-                              "-"
+                              <p className="text-slate-500">-</p>
                             )}
-                          </td>
-                          <td className="px-4 sm:px-5 py-4 sm:py-5 align-top text-sm text-slate-700">
-                            {normalized.experienceLabel}
-                          </td>
-                          <td className="px-4 sm:px-5 py-4 sm:py-5 align-top text-sm text-slate-700">
-                            {normalized.appliedDate}
-                          </td>
-                          <td className="px-4 sm:px-5 py-4 sm:py-5 align-top">
-                            <select
-                              value={normalized.currentStatus}
-                              onChange={(event) =>
-                                handleStatusUpdate(
-                                  normalized.id,
-                                  event.target.value,
-                                )
-                              }
-                              disabled={
-                                updatingId === normalized.id ||
-                                normalized.isStatusLocked
-                              }
-                              className="w-full min-w-36 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
-                            >
-                              {statusOptions.map((statusOption) => (
-                                <option key={statusOption} value={statusOption}>
-                                  {statusOption.charAt(0).toUpperCase() +
-                                    statusOption.slice(1)}
-                                </option>
-                              ))}
-                            </select>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </>
+                          </div>
+
+                          <div>
+                            <p className="mb-1 font-semibold text-slate-800">
+                              Projects
+                            </p>
+                            {normalized.projectsList.length > 0 ? (
+                              <ul className="space-y-2">
+                                {normalized.projectsList.map(
+                                  (project, index) => (
+                                    <li
+                                      key={`${normalized.id}-project-${index}`}
+                                      className="rounded-lg bg-slate-50 p-3"
+                                    >
+                                      <div className="font-medium text-slate-800">
+                                        {project.title || "Project"}
+                                      </div>
+                                      {project.description && (
+                                        <p className="mt-1 text-xs text-slate-500">
+                                          {project.description}
+                                        </p>
+                                      )}
+                                      {project.link && (
+                                        <a
+                                          href={project.link}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="mt-1 inline-block break-all text-xs text-blue-600 hover:underline"
+                                        >
+                                          {project.link}
+                                        </a>
+                                      )}
+                                    </li>
+                                  ),
+                                )}
+                              </ul>
+                            ) : (
+                              <p className="text-slate-500">-</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                      <div>
+                        <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                          Applied On
+                        </p>
+                        <p className="text-sm text-slate-700">
+                          {normalized.appliedDate}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                          Experience Summary
+                        </p>
+                        <p className="text-sm text-slate-700">
+                          {normalized.experienceLabel}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                          Update Status
+                        </label>
+                        <select
+                          value={normalized.currentStatus}
+                          onChange={(event) =>
+                            handleStatusUpdate(
+                              normalized.id,
+                              event.target.value,
+                            )
+                          }
+                          disabled={
+                            updatingId === normalized.id ||
+                            normalized.isStatusLocked
+                          }
+                          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {statusOptions.map((statusOption) => (
+                            <option key={statusOption} value={statusOption}>
+                              {statusOption.charAt(0).toUpperCase() +
+                                statusOption.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
