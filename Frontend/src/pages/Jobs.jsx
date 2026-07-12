@@ -4,13 +4,17 @@ import axios from "axios";
 import { toast, Slide } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 export default function Jobs() {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState("");
+  const [appliedJobIds, setAppliedJobIds] = useState(null);
+  const canApply = user?.role !== "employer";
+  const isJobApplied = (jobId) =>
+    Array.isArray(appliedJobIds) && appliedJobIds.includes(String(jobId));
   //Loads jobs
   useEffect(() => {
     const fetchJobs = async () => {
@@ -33,6 +37,49 @@ export default function Jobs() {
     fetchJobs();
   }, []);
 
+  useEffect(() => {
+    const fetchAppliedJobs = async () => {
+      setAppliedJobIds(null);
+
+      if (authLoading) {
+        return;
+      }
+
+      if (!user || user.role !== "jobseeker") {
+        setAppliedJobIds([]);
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/application/my-applications`,
+          {
+            withCredentials: true,
+          },
+        );
+
+        const applications = Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+
+        setAppliedJobIds(
+          applications
+            .map((application) =>
+              typeof application.job === "object"
+                ? application.job?._id
+                : application.job,
+            )
+            .filter(Boolean)
+            .map(String),
+        );
+      } catch (err) {
+        setAppliedJobIds([]);
+      }
+    };
+
+    fetchAppliedJobs();
+  }, [authLoading, user]);
+
   //Disable scroll when modal is open
   useEffect(() => {
     if (isModalOpen) {
@@ -47,6 +94,10 @@ export default function Jobs() {
   }, [isModalOpen]);
 
   const handleApplyJob = (jobId) => {
+    if (isJobApplied(jobId)) {
+      return;
+    }
+
     if (!user) {
       toast.error("Please log in to apply for jobs.", {
         position: "top-right",
@@ -119,8 +170,17 @@ export default function Jobs() {
                       theme: "light",
                       transition: Slide,
                     });
+                    setAppliedJobIds((currentIds) => [
+                      ...new Set([...currentIds, String(selectedJobId)]),
+                    ]);
                     setIsModalOpen(false);
                   } catch (error) {
+                    if (error.response?.status === 409) {
+                      setAppliedJobIds((currentIds) => [
+                        ...new Set([...currentIds, String(selectedJobId)]),
+                      ]);
+                    }
+
                     toast.error(
                       error.response?.data?.message || "Something went wrong",
                       {
@@ -280,17 +340,28 @@ export default function Jobs() {
 
                   <div className="flex gap-4">
                     <button
-                      className="flex-1 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50 hover:bg-slate-100 transition border border-slate-100 cursor-pointer"
+                      className={`px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider bg-slate-200 hover:bg-slate-300 transition border border-slate-100 cursor-pointer ${
+                        canApply ? "flex-1" : "w-full"
+                      }`}
                       onClick={() => handleViewJob(job._id)}
                     >
                       View details
                     </button>
-                    <button
-                      className="flex-1 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-900 transition shadow-lg shadow-indigo-100 cursor-pointer"
-                      onClick={() => handleApplyJob(job._id)}
-                    >
-                      Apply now
-                    </button>
+                    {canApply && (
+                      <button
+                        disabled={
+                          appliedJobIds === null || isJobApplied(job._id)
+                        }
+                        className="flex-1 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-900 transition shadow-lg shadow-indigo-100 cursor-pointer disabled:bg-slate-300 disabled:text-slate-600 disabled:shadow-none disabled:cursor-not-allowed disabled:hover:bg-slate-300"
+                        onClick={() => handleApplyJob(job._id)}
+                      >
+                        {appliedJobIds === null
+                          ? "Checking..."
+                          : isJobApplied(job._id)
+                            ? "Applied"
+                            : "Apply now"}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
