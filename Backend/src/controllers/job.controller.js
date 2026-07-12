@@ -17,6 +17,8 @@ const createJob = async (req, res) => {
       !title?.trim() ||
       !description?.trim() ||
       !Array.isArray(requirements) ||
+      requirements.length === 0 ||
+      requirements.some((requirement) => !String(requirement).trim()) ||
       !jobType ||
       !company?.trim() ||
       !location?.trim() ||
