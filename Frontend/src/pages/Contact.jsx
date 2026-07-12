@@ -1,6 +1,38 @@
 import { Mail, Phone, MapPin } from "lucide-react";
+import React, { useRef, useState } from "react";
+import emailjs from "@emailjs/browser";
+import { toast } from "react-toastify";
 
 const Contact = () => {
+  const form = useRef();
+  const [isSending, setIsSending] = useState(false);
+
+  const handleEmail = async (e) => {
+    e.preventDefault();
+
+    if (isSending) return;
+
+    setIsSending(true);
+
+    try {
+      await emailjs.sendForm(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        form.current,
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+      );
+
+      toast.success("Message sent successfully!");
+
+      form.current.reset();
+    } catch (error) {
+      console.error(error);
+
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setIsSending(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-100 p-5">
       {/* Heading */}
@@ -55,13 +87,15 @@ const Contact = () => {
 
         {/* Right Side Form */}
         <div className="bg-white p-8 rounded-2xl shadow-md">
-          <form className="space-y-5">
+          <form ref={form} className="space-y-5" onSubmit={handleEmail}>
             <div>
               <label className="block text-sm font-medium mb-1">Name</label>
               <input
                 type="text"
                 placeholder="Your name"
                 className="w-full border rounded-sm px-4 py-1  outline-none"
+                name="from_name"
+                required
               />
             </div>
 
@@ -71,6 +105,8 @@ const Contact = () => {
                 type="email"
                 placeholder="you@example.com"
                 className="w-full border rounded-sm px-4 py-1  outline-none"
+                name="from_email"
+                required
               />
             </div>
 
@@ -80,6 +116,8 @@ const Contact = () => {
                 type="text"
                 placeholder="How can we help?"
                 className="w-full border rounded-sm px-4 py-1  outline-none"
+                name="subject"
+                required
               />
             </div>
 
@@ -89,14 +127,22 @@ const Contact = () => {
                 rows="4"
                 placeholder="Tell us more..."
                 className="w-full border rounded-sm px-4 py-2  outline-none resize-none"
+                name="message"
+                required
               ></textarea>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-blue-600 cursor-pointer text-white py-3 transition-all duration-300 hover:shadow-xl font-bold rounded-sm hover:bg-blue-600 hover:text-white hover:outline-0 "
+              disabled={isSending}
+              className={`w-full py-3 rounded-sm font-bold transition-all duration-300
+  ${
+    isSending
+      ? "bg-gray-400 cursor-not-allowed text-white"
+      : "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer hover:shadow-xl"
+  }`}
             >
-              Send Message
+              {isSending ? "Sending..." : "Send Message"}
             </button>
           </form>
         </div>
