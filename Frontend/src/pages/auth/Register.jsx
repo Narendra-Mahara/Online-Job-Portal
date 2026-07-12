@@ -15,7 +15,17 @@ const Register = () => {
   const [pending, setPending] = useState(false);
   const handleForm = async (e) => {
     e.preventDefault();
-    setPending(true);
+
+    if (password.length < 8) {
+      toast.error("Password must contain at least 8 characters", {
+        position: "top-right",
+        autoClose: 2000,
+        theme: "light",
+        transition: Slide,
+      });
+      return;
+    }
+
     if (!role) {
       toast.error("Please select a role (Job Seeker or Employer)", {
         position: "top-right",
@@ -23,9 +33,10 @@ const Register = () => {
         theme: "light",
         transition: Slide,
       });
-      setPending(false);
       return;
     }
+
+    setPending(true);
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/users/register`,
@@ -136,9 +147,13 @@ const Register = () => {
                 id="password"
                 placeholder="•••••••••"
                 required
+                minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <p className="text-xs text-gray-500">
+                Password must be at least 8 characters long.
+              </p>
             </div>
 
             <div className="flex flex-col text-left gap-2">
