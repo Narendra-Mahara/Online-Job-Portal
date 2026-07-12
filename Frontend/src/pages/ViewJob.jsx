@@ -5,7 +5,7 @@ import { toast, Slide } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 
 const ViewJob = () => {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
   const { jobId } = useParams();
   const navigate = useNavigate();
   const [job, setJob] = useState(null);
@@ -13,6 +13,8 @@ const ViewJob = () => {
   const [error, setError] = useState("");
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
+  const [hasApplied, setHasApplied] = useState(null);
+  const canApply = user?.role !== "employer";
 
   // Fetch job details on component mount
   useEffect(() => {
@@ -37,6 +39,49 @@ const ViewJob = () => {
     }
   }, [jobId]);
 
+  useEffect(() => {
+    const fetchApplicationStatus = async () => {
+      setHasApplied(null);
+
+      if (authLoading) {
+        return;
+      }
+
+      if (!user || user.role !== "jobseeker" || !jobId) {
+        setHasApplied(false);
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/application/my-applications`,
+          {
+            withCredentials: true,
+          },
+        );
+
+        const applications = Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+
+        setHasApplied(
+          applications.some((application) => {
+            const appliedJobId =
+              typeof application.job === "object"
+                ? application.job?._id
+                : application.job;
+
+            return appliedJobId === jobId;
+          }),
+        );
+      } catch (err) {
+        setHasApplied(false);
+      }
+    };
+
+    fetchApplicationStatus();
+  }, [authLoading, jobId, user]);
+
   // Disable scroll when apply modal is open
   useEffect(() => {
     if (isApplyModalOpen) {
@@ -51,6 +96,10 @@ const ViewJob = () => {
   }, [isApplyModalOpen]);
 
   const handleApplyJob = async () => {
+    if (hasApplied !== false) {
+      return;
+    }
+
     setIsApplying(true);
     try {
       const response = await axios.post(
@@ -72,8 +121,13 @@ const ViewJob = () => {
         theme: "light",
         transition: Slide,
       });
+      setHasApplied(true);
       setIsApplyModalOpen(false);
     } catch (error) {
+      if (error.response?.status === 409) {
+        setHasApplied(true);
+      }
+
       toast.error(
         error.response?.data?.message ||
           "Failed to apply for job. Please try again.",
@@ -252,33 +306,47 @@ const ViewJob = () => {
                 </p>
               </div>
 
-              <button
-                onClick={() => {
-                  setIsApplyModalOpen(true);
-                  if (!user) {
-                    toast.error("Please log in to apply for jobs.", {
-                      position: "top-right",
-                      autoClose: 2000,
-                      hideProgressBar: false,
-                      closeOnClick: false,
-                      pauseOnHover: false,
-                      draggable: false,
-                      progress: undefined,
-                      theme: "light",
-                      transition: Slide,
-                    });
-                    navigate("/login");
-                    return;
-                  }
-                }}
-                className="w-full px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold transition shadow-md hover:shadow-lg mb-4 cursor-pointer"
-              >
-                Apply Now
-              </button>
+              {canApply && (
+                <button
+                  onClick={() => {
+                    if (hasApplied !== false) {
+                      return;
+                    }
+
+                    if (!user) {
+                      toast.error("Please log in to apply for jobs.", {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: false,
+                        pauseOnHover: false,
+                        draggable: false,
+                        progress: undefined,
+                        theme: "light",
+                        transition: Slide,
+                      });
+                      navigate("/login");
+                      return;
+                    }
+
+                    setIsApplyModalOpen(true);
+                  }}
+                  disabled={hasApplied !== false}
+                  className="w-full px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold transition shadow-md hover:shadow-lg mb-4 cursor-pointer disabled:bg-slate-300 disabled:text-slate-600 disabled:shadow-none disabled:cursor-not-allowed"
+                >
+                  {hasApplied === null
+                    ? "Checking..."
+                    : hasApplied
+                      ? "Applied"
+                      : "Apply Now"}
+                </button>
+              )}
 
               <button
                 onClick={() => navigate("/jobs")}
-                className="w-full px-6 py-3 rounded-lg border-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold transition cursor-pointer"
+                className={`w-full px-6 py-3 rounded-lg border-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold transition cursor-pointer ${
+                  canApply ? "" : "mb-4"
+                }`}
               >
                 Browse More Jobs
               </button>
