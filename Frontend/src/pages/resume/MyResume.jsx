@@ -11,6 +11,7 @@ const MyResume = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedResumeId, setSelectedResumeId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [hasApplications, setHasApplications] = useState(false);
 
   const fetchResumes = async () => {
     try {
@@ -30,8 +31,26 @@ const MyResume = () => {
     }
   };
 
+  const fetchApplications = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/application/my-applications`,
+        { withCredentials: true },
+      );
+
+      const applications = Array.isArray(response.data?.data)
+        ? response.data.data
+        : [];
+
+      setHasApplications(applications.length > 0);
+    } catch (err) {
+      setHasApplications(false);
+    }
+  };
+
   useEffect(() => {
     fetchResumes();
+    fetchApplications();
   }, []);
 
   const handleDelete = (resumeId) => {
@@ -80,7 +99,7 @@ const MyResume = () => {
             <button
               disabled={Boolean(resume)}
               onClick={() => navigate("/resume-builder")}
-              className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+              className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:opacity-50 transition"
               title={resume ? "You already have a resume" : "Create a resume"}
             >
               Create Resume
@@ -141,7 +160,13 @@ const MyResume = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleDelete(resume._id)}
-                      className="rounded-md border border-rose-200 px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50"
+                      disabled={hasApplications}
+                      title={
+                        hasApplications
+                          ? "Unable to delete resume because you have already applied for a job"
+                          : "Delete resume"
+                      }
+                      className="rounded-md border border-rose-200 px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50 transition"
                     >
                       Delete
                     </button>
@@ -185,7 +210,7 @@ const MyResume = () => {
                 {resume.skills?.map((s, i) => (
                   <span
                     key={i}
-                    className="rounded-full bg-slate-50 px-3 py-1 text-sm text-slate-700"
+                    className="rounded-full bg-slate-300 px-3 py-1 text-sm text-slate-700"
                   >
                     {s}
                   </span>
@@ -220,7 +245,7 @@ const MyResume = () => {
                 <button
                   onClick={confirmDelete}
                   disabled={isDeleting}
-                  className="rounded-md bg-rose-600 px-3 py-2 text-sm font-semibold text-white hover:bg-rose-700 disabled:opacity-60"
+                  className="rounded-md bg-rose-600 px-3 py-2 text-sm font-semibold text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50 transition"
                 >
                   {isDeleting ? "Deleting..." : "Delete"}
                 </button>
