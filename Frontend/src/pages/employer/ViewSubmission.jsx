@@ -43,6 +43,9 @@ const ViewSubmission = () => {
 
     return {
       id: submission._id,
+      applicantImage:
+        applicant.profileImage ||
+        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
       fullName: personalInfo.fullName || applicant.name || "Unknown candidate",
       email: personalInfo.email || applicant.email || "-",
       phone: personalInfo.phone || applicant.phone || "No phone",
@@ -192,19 +195,28 @@ const ViewSubmission = () => {
                     aria-controls={`submission-panel-${normalized.id}`}
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-base font-semibold text-slate-900 sm:text-lg">
-                          {normalized.fullName}
-                        </h3>
-                        <span
-                          className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold capitalize ${statusStyles[normalized.currentStatus] || statusStyles.pending}`}
-                        >
-                          {normalized.currentStatus}
-                        </span>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <img
+                          src={normalized.applicantImage}
+                          alt={normalized.fullName}
+                          className="h-15 w-15 shrink-0 rounded-full border border-slate-200 object-cover"
+                        />
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-base font-semibold text-slate-900 sm:text-lg">
+                              {normalized.fullName}
+                            </h3>
+                            <span
+                              className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold capitalize ${statusStyles[normalized.currentStatus] || statusStyles.pending}`}
+                            >
+                              {normalized.currentStatus}
+                            </span>
+                          </div>
+                          <p className="mt-1 truncate text-sm text-slate-500">
+                            {normalized.email}
+                          </p>
+                        </div>
                       </div>
-                      <p className="mt-1 truncate text-sm text-slate-500">
-                        {normalized.email}
-                      </p>
                       <p className="mt-2 line-clamp-2 text-sm text-slate-600">
                         {normalized.summary}
                       </p>
