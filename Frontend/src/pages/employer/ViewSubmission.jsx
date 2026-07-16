@@ -43,9 +43,9 @@ const ViewSubmission = () => {
 
     return {
       id: submission._id,
-      fullName: applicant.name || personalInfo.fullName || "Unknown candidate",
-      email: applicant.email || personalInfo.email || "-",
-      phone: applicant.phone || personalInfo.phone || "No phone",
+      fullName: personalInfo.fullName || applicant.name || "Unknown candidate",
+      email: personalInfo.email || applicant.email || "-",
+      phone: personalInfo.phone || applicant.phone || "No phone",
       address: personalInfo.address || "-",
       linkedIn: personalInfo.linkedIn || "",
       github: personalInfo.github || "",
