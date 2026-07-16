@@ -5,6 +5,8 @@ import { toast, Slide } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 
 const ViewJob = () => {
+  const DEFAULT_PROFILE_IMAGE =
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
   const { user, authLoading } = useAuth();
   const { jobId } = useParams();
   const navigate = useNavigate();
@@ -326,6 +328,21 @@ const ViewJob = () => {
                         transition: Slide,
                       });
                       navigate("/login");
+                      return;
+                    }
+                    // Check if the user's profile image is the default one
+                    if (user.profileImage === DEFAULT_PROFILE_IMAGE) {
+                      toast.warning(
+                        "Please upload your profile picture before applying for a job.",
+                        {
+                          position: "top-right",
+                          autoClose: 2500,
+                          theme: "light",
+                          transition: Slide,
+                        },
+                      );
+
+                      navigate("/jobseeker/profile");
                       return;
                     }
 

@@ -3,7 +3,10 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, Slide } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
+
 export default function Jobs() {
+  const DEFAULT_PROFILE_IMAGE =
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
   const { user, authLoading } = useAuth();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
@@ -111,6 +114,14 @@ export default function Jobs() {
         transition: Slide,
       });
       navigate("/login");
+      return;
+    }
+
+    if (user.profileImage === DEFAULT_PROFILE_IMAGE) {
+      toast.warning(
+        "Please upload your profile picture before applying for a job.",
+      );
+      navigate("/jobseeker/profile");
       return;
     }
     setIsModalOpen(true);
