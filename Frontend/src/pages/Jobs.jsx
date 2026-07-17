@@ -325,8 +325,11 @@ export default function Jobs() {
                 </div>
                 {/* JOB SUMMARY LINE - Normal Text Style */}
                 <p className="text-sm text-slate-500 leading-relaxed border-l-2 border-slate-100 pl-3">
-                  {job.description ||
-                    `Join our team as a ${job.title} to help us scale and deliver high-quality solutions in the Nepal market.`}
+                  {job.description
+                    ? `${job.description.split(" ").slice(0, 29).join(" ")}${
+                        job.description.split(" ").length > 29 ? "..." : ""
+                      }`
+                    : `Join our team as a ${job.title} to help us scale and deliver high-quality solutions in the Nepal market.`}
                 </p>
 
                 {/* TAGS */}
