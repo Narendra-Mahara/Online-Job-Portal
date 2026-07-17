@@ -112,6 +112,7 @@ const PostJob = () => {
               value={form.title}
               onChange={handleChange}
               className={inputClass}
+              placeholder="e.g. Senior Frontend Developer"
             />
 
             <label className="block mt-4 mb-2 text-sm font-medium text-slate-700">
@@ -122,6 +123,7 @@ const PostJob = () => {
               value={form.company}
               onChange={handleChange}
               className={inputClass}
+              placeholder="e.g. Tech Corp"
             />
 
             <label className="block mt-4 mb-2 text-sm font-medium text-slate-700">
@@ -132,6 +134,7 @@ const PostJob = () => {
               value={form.location}
               onChange={handleChange}
               className={inputClass}
+              placeholder="e.g. Kanchanpur, Nepal"
             />
 
             <div className="grid grid-cols-2 gap-3 mt-4">
@@ -144,6 +147,7 @@ const PostJob = () => {
                   value={form.salaryMin}
                   onChange={handleChange}
                   className={inputClass}
+                  placeholder="e.g. 50000"
                 />
               </div>
               <div>
@@ -155,6 +159,7 @@ const PostJob = () => {
                   value={form.salaryMax}
                   onChange={handleChange}
                   className={inputClass}
+                  placeholder="e.g. 100000"
                 />
               </div>
             </div>
@@ -181,6 +186,7 @@ const PostJob = () => {
               value={form.requirements}
               onChange={handleChange}
               className={inputClass}
+              placeholder="e.g. React, Node.js, SQL"
             />
 
             <label className="block mt-4 mb-2 text-sm font-medium text-slate-700">
@@ -191,6 +197,7 @@ const PostJob = () => {
               value={form.description}
               onChange={handleChange}
               className={`${inputClass} min-h-36`}
+              placeholder="Write a detailed job description here..."
             />
           </div>
 
