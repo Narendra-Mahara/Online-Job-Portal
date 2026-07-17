@@ -59,7 +59,7 @@ const Contact = () => {
               </div>
               <div>
                 <p className="font-medium">Email</p>
-                <p className="text-gray-500">support@careerforge.net</p>
+                <p className="text-gray-500">support@careerforge.bond</p>
               </div>
             </div>
 
@@ -93,7 +93,7 @@ const Contact = () => {
               <input
                 type="text"
                 placeholder="Your name"
-                className="w-full border rounded-sm px-4 py-1  outline-none"
+                className="w-full rounded-sm px-4 py-1  outline-none border border-gray-400  placeholder:text-sm"
                 name="from_name"
                 required
               />
@@ -104,7 +104,7 @@ const Contact = () => {
               <input
                 type="email"
                 placeholder="you@example.com"
-                className="w-full border rounded-sm px-4 py-1  outline-none"
+                className="w-full  rounded-sm px-4 py-1  outline-none border border-gray-400  placeholder:text-sm"
                 name="from_email"
                 required
               />
@@ -115,7 +115,7 @@ const Contact = () => {
               <input
                 type="text"
                 placeholder="How can we help?"
-                className="w-full border rounded-sm px-4 py-1  outline-none"
+                className="w-full  rounded-sm px-4 py-1  outline-none border border-gray-400  placeholder:text-sm"
                 name="subject"
                 required
               />
@@ -126,7 +126,7 @@ const Contact = () => {
               <textarea
                 rows="4"
                 placeholder="Tell us more..."
-                className="w-full border rounded-sm px-4 py-2  outline-none resize-none"
+                className="w-full rounded-sm px-4 py-2  outline-none resize-none border border-gray-400  placeholder:text-sm"
                 name="message"
                 required
               ></textarea>
