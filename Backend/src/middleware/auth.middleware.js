@@ -26,7 +26,12 @@ export const isEmployer = (req, res, next) => {
   if (req.user && req.user.role === "employer") {
     next();
   } else {
-    next(new ApiError(403, "Access denied. Only employers can post jobs."));
+    next(
+      new ApiError(
+        403,
+        "Access denied. Only employers can access this resource.",
+      ),
+    );
   }
 };
 
@@ -34,6 +39,11 @@ export const isJobseeker = (req, res, next) => {
   if (req.user && req.user.role === "jobseeker") {
     next();
   } else {
-    next(new ApiError(403, "Access denied. Only employers can post jobs."));
+    next(
+      new ApiError(
+        403,
+        "Access denied. Only job seekers can access this resource.",
+      ),
+    );
   }
 };
