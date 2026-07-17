@@ -7,6 +7,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { FaRegFileAlt, FaRegUserCircle, FaBriefcase } from "react-icons/fa";
 import { FiLogOut, FiSearch } from "react-icons/fi";
+import { IoMdMail } from "react-icons/io";
+import { FaUsers } from "react-icons/fa6";
 import {
   MdDashboard,
   MdHome,
@@ -169,6 +171,26 @@ const NavBar = () => {
               <li className="text-gray-300">Loading...</li>
             ) : !user ? (
               <>
+                <Link
+                  to="/about"
+                  onClick={closeMobileMenu}
+                  className="inline-flex items-center gap-2"
+                >
+                  <li className="inline-flex items-center gap-2">
+                    <FaUsers />
+                    About
+                  </li>
+                </Link>
+                <Link
+                  to="/contact"
+                  onClick={closeMobileMenu}
+                  className="inline-flex items-center gap-2"
+                >
+                  <li className="inline-flex items-center gap-2">
+                    <IoMdMail />
+                    Contact
+                  </li>
+                </Link>
                 <li>
                   <Link
                     to="/login"
@@ -275,6 +297,48 @@ const NavBar = () => {
 
         <div className="hidden md:block">
           <ul className="flex items-center gap-5">
+            <li>
+              <NavLink
+                className={({ isActive }) =>
+                  `hover:text-blue-600 font-medium transition-colors ${
+                    isActive
+                      ? "text-blue-600 underline decoration-2 underline-offset-2"
+                      : "text-gray-600"
+                  }`
+                }
+                to="/"
+              >
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                className={({ isActive }) =>
+                  `hover:text-blue-600 font-medium transition-colors ${
+                    isActive
+                      ? "text-blue-600 underline decoration-2 underline-offset-2"
+                      : "text-gray-600"
+                  }`
+                }
+                to="/about"
+              >
+                About
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                className={({ isActive }) =>
+                  `hover:text-blue-600 font-medium transition-colors ${
+                    isActive
+                      ? "text-blue-600 underline decoration-2 underline-offset-2"
+                      : "text-gray-600"
+                  }`
+                }
+                to="/contact"
+              >
+                Contact
+              </NavLink>
+            </li>
             <li>
               <NavLink
                 className={({ isActive }) =>
