@@ -334,8 +334,8 @@ const NavBar = () => {
                         }}
                         to={
                           user.role === "employer"
-                            ? "/employer/dashboard"
-                            : "/jobseeker/dashboard"
+                            ? "/employer/profile"
+                            : "/jobseeker/profile"
                         }
                         className="px-4 py-2 text-gray-800 hover:bg-gray-100 inline-flex items-center gap-2 w-full"
                       >
