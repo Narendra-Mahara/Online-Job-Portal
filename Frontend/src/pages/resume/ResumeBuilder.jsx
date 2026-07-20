@@ -2,12 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 const ResumeBuilder = () => {
+  const location = useLocation();
+  const extractedResume = location.state;
   const navigate = useNavigate();
   const [isCheckingResume, setIsCheckingResume] = useState(true);
   const hasCheckedResumeRef = useRef(false);
-  const [formData, setFormData] = useState({
+  const emptyResume = {
     personalInfo: {
       fullName: "",
       email: "",
@@ -44,8 +47,8 @@ const ResumeBuilder = () => {
         link: "",
       },
     ],
-  });
-
+  };
+  const [formData, setFormData] = useState(extractedResume || emptyResume);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 

@@ -12,7 +12,8 @@ const MyResume = () => {
   const [selectedResumeId, setSelectedResumeId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [hasApplications, setHasApplications] = useState(false);
-
+  const [resumeFile, setResumeFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const formatDate = (value) => {
     if (!value) {
       return "-";
@@ -111,6 +112,44 @@ const MyResume = () => {
     setSelectedResumeId(null);
   };
 
+  const handleResumeUpload = async () => {
+    if (!resumeFile) {
+      toast.error("Please select a PDF file.");
+      return;
+    }
+
+    if (resumeFile.type !== "application/pdf") {
+      toast.error("Only PDF files are allowed.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("resume", resumeFile);
+
+    try {
+      setIsUploading(true);
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/resume/upload-pdf`,
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      toast.success(response.data.message);
+      navigate("/resume-builder", {
+        state: response.data.data,
+      });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to upload resume.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
   return (
     <div className="min-h-screen w-full bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-6xl">
@@ -144,15 +183,57 @@ const MyResume = () => {
         )}
 
         {!loading && !error && !resume && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-            <p className="text-slate-700">You have no saved resume.</p>
-            <div className="mt-4">
-              <button
-                onClick={() => navigate("/resume-builder")}
-                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
-              >
-                Create your first resume
-              </button>
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+            <h2 className="text-2xl font-bold text-slate-900">
+              Upload Your Resume
+            </h2>
+
+            <p className="mt-2 text-slate-500">
+              Upload your resume in PDF format and we'll automatically extract
+              the information into the resume builder.
+            </p>
+
+            <div className="mt-8">
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={(e) => setResumeFile(e.target.files[0])}
+                className="block w-full rounded-lg border border-slate-300
+        text-sm text-slate-700
+        file:mr-4
+        file:rounded-md
+        file:border-0
+        file:bg-blue-600
+        file:px-4
+        file:py-2
+        file:text-white
+        hover:file:bg-blue-700"
+              />
+
+              {resumeFile && (
+                <p className="mt-3 text-sm text-slate-500">
+                  Selected File: <strong>{resumeFile.name}</strong>
+                </p>
+              )}
+
+              <div className="mt-6 flex gap-4">
+                <button
+                  type="button"
+                  onClick={handleResumeUpload}
+                  disabled={isUploading}
+                  className="rounded-lg bg-green-600 px-6 py-3 text-white hover:bg-green-700 disabled:opacity-50"
+                >
+                  {isUploading ? "Uploading..." : "Upload Resume"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate("/resume-builder")}
+                  className="rounded-lg border border-slate-300 px-6 py-3 text-slate-700 hover:bg-slate-100"
+                >
+                  Create Manually
+                </button>
+              </div>
             </div>
           </div>
         )}
