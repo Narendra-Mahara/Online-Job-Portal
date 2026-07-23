@@ -6,7 +6,11 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://careerforge.bond",
+      "https://www.careerforge.bond",
+    ],
     credentials: true,
   }),
 ); // Enable CORS for all origins
